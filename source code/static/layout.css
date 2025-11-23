@@ -1,0 +1,23 @@
+/* ======================================= */
+/* 01-LAYOUT.CSS: Estructura y Grid */
+/* ======================================= */
+
+/* --- Contenedor Principal de la Página --- */
+.products-grid-container {
+    padding: 30px 5%;
+}
+
+.products-grid-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--color-primary);
+}
+
+/* --- Grid de Productos (Layout) --- */
+/* Dentro de 01-layout.css */
+.products-grid {
+    display: grid;
+    /* Define 4 columnas fijas que ocupan el mismo tamaño (1fr) */
+    grid-template-columns: repeat(4, 1fr); 
+    gap: 25px;
+}
