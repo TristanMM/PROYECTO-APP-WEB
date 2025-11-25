@@ -21,7 +21,7 @@
 
     <header class="main-header">
         <div class="header-banner">
-            <img src="okamiFitBanner.jpg" alt="Banner de OkamiFit" class="banner-image">
+            <img src="ban.jpg" alt="Banner de OkamiFit" class="banner-image">
         </div>
     </header>
 
@@ -32,12 +32,17 @@
             <section id="admin-panel" class="admin-panel-content">
                 <h2>Gestión de Catálogo 🛒</h2>
                 <div class="admin-menu">
-                    <button id="show-add-form-btn" class="action-btn primary">➕ Agregar Producto Nuevo</button>
-                    <button id="show-list-btn" class="action-btn secondary">📝 Ver / Editar Productos</button>
+                    <button id="show-list-btn" class="action-btn primary">📝 Gestionar Productos</button>
                 </div>
 
+                <div id="edit-product-list" class="admin-list-container hidden">
+                    <h3>Lista de Productos</h3>
+                    <p>Se está cargando el listado...</p>
+                    
+                    </div>
+                
                 <div id="add-product-form-container" class="admin-form-container hidden">
-                    <h3>Agregar Nuevo Producto</h3>
+                    <h3>Agregar/Editar Producto</h3>
                     <form id="new-product-form" class="crud-form" enctype="multipart/form-data">
                         <label for="new-product-name">Nombre:</label>
                         <input type="text" id="new-product-name" name="nombre" required>
@@ -48,33 +53,30 @@
                         <label for="new-product-tag">Tag (Ej: Proteína, Creatina, Oferta):</label>
                         <input type="text" id="new-product-tag" name="tag" required>
 
-                        <label for="new-product-filter-id">ID de Artículo (Categoría 1-6):</label>
-                        <input type="number" id="new-product-filter-id" name="idArticulo" required min="1" max="6">
+                        <label for="new-product-filter-id">ID de Artículo (Categoría 1-9):</label>
+                        <input type="number" id="new-product-filter-id" name="idArticulo" required min="1" max="9">
 
                         <label for="new-product-image-file">Subir Imagen:</label>
                         <input type="file" id="new-product-image-file" name="imagenFile" accept="image/*" required>
 
                         <h4>Stock Inicial por Variante (Peso/Sabor):</h4>
                         <div id="new-product-stock-inputs" class="stock-inputs-grid">
-                        </div>
+                            </div>
 
                         <button type="submit" class="action-btn primary">Guardar Producto</button>
                     </form>
                 </div>
-
-                <div id="edit-product-list" class="admin-list-container hidden">
-                    <h3>Lista de Productos</h3>
-                    <p>Se está cargando el listado...</p>
-                </div>
             </section>
         </div>
     </div>
+    
     <div id="login-form-container">
         <form id="master-login-form" class="login-form hidden">
             <h3>Acceso Maestro</h3>
             <input type="text" id="login-username" placeholder="Usuario Maestro" required>
             <input type="password" id="login-password" placeholder="Contraseña" required>
             <button type="submit">Iniciar Sesión</button>
+            <button class="close-login-btn">❌</button>
             <p id="login-message" class="error-message"></p>
         </form>
     </div>
@@ -84,10 +86,13 @@
             <a href="#" class="filter-link active" data-filter-id="0">Todos</a>
             <a href="#" class="filter-link" data-filter-id="1">Proteínas</a>
             <a href="#" class="filter-link" data-filter-id="2">Creatinas</a>
-            <a href="#" class="filter-link" data-filter-id="3">Aminoácidos</a>
-            <a href="#" class="filter-link" data-filter-id="4">Vitaminas</a>
+            <a href="#" class="filter-link" data-filter-id="3">Mass Gainer</a>
+            <a href="#" class="filter-link" data-filter-id="4">Aminoácido</a>
             <a href="#" class="filter-link" data-filter-id="5">Pre-Entreno</a>
-            <a href="#" class="filter-link" data-filter-id="6">Suplementos Varios</a>
+            <a href="#" class="filter-link" data-filter-id="6">Glutamina</a>
+            <a href="#" class="filter-link" data-filter-id="7">Shakers</a>
+            <a href="#" class="filter-link" data-filter-id="8">Colageno</a>
+            <a href="#" class="filter-link" data-filter-id="9">Suplementos Varios</a>
         </div>
     </nav>
 
@@ -99,10 +104,30 @@
 
     <hr>
 
-    <footer>
-        <p>&copy; 2025 OkamiFit. Todos los derechos reservados.</p>
-        <p>Diseñado para propósitos de demostración.</p>
-    </footer>
+   <footer>
+    <div class="footer-container">
+        <div class="footer-col brand-contact">
+            <h2>OKAMI FIT</h2>
+            <p>Tu tienda de suplementos de confianza.</p>
+            <p>Contacto: +506 8756-8991</p>
+            <ul class="social-links">
+                <li><a href="https://www.facebook.com/share/1Fv6RHfnec/?mibextid=wwXIfr" aria-label="Facebook">Facebook<i class="fab fa-facebook-f"></i></a></li>
+                <li><a href="https://www.instagram.com/okamifit_cr?igsh=MTZqbjd2ajRncmxhdA%3D%3D&utm_source=qr" aria-label="Instagram">Instagram<i class="fab fa-instagram"></i></a></li>
+                
+            </ul>
+        </div>
+
+        <div class="footer-col okami-links">
+            <h2 class="hidden-title">Okami</h2> <ul class="link-list">
+                <li><a href="#">Okami</a></li>
+                <li><a href="#">Quienes somos</a></li>
+                <li><a href="#">vision</a></li>
+                <li><a href="#">ubicaciones</a></li>
+            </ul>
+        </div>
+    </div>
+
+</footer>
 
     <div class="floating-actions">
         <button class="action-btn">Perfil Maestro</button>
@@ -134,7 +159,7 @@
         </div>
     </div>
 
-    <script src="script.js"></script>
+    <script src="script2.js"></script>
 </body>
 
 </html>

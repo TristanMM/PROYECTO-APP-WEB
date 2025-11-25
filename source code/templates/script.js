@@ -1,21 +1,26 @@
 // =========================================================================
-// script.js: LÓGICA PRINCIPAL DEL E-COMMERCE Y PANEL DE ADMINISTRACIÓN
+// script.js: LÓGICA PRINCIPAL DEL E-COMMERCE Y PANEL DE ADMINISTRACIÓN (REFRACTORIZADO)
 // =========================================================================
 
 // --- 1. BASE DE DATOS DE PRODUCTOS (SIMULADA) ---
 const productData = [
-    // Datos actualizados para Suplementos OkamiFit
-    { id: 1, idProducto: 'P001', name: "Whey Protein Isolate", tag: "Proteína", tagClass: "protein", price: 35000, isOffer: false },
-    { id: 2, idProducto: 'C001', name: "Creatina Monohidratada", tag: "¡Oferta!", tagClass: "offer", price: 18000, newPrice: 15500, isOffer: true },
-    { id: 1, idProducto: 'P002', name: "Caseína Chocolate", tag: "Noche", tagClass: "night", price: 32000, isOffer: false },
-    { id: 3, idProducto: 'A001', name: "BCAAs Limón", tag: "Recuperación", tagClass: "recovery", price: 19500, isOffer: false },
-    { id: 2, idProducto: 'C002', name: "Creatina Sab. Frutas", tag: "¡Oferta!", tagClass: "offer", price: 21000, newPrice: 17000, isOffer: true },
-    { id: 4, idProducto: 'V001', name: "Multivitamínico Diario", tag: "Salud", tagClass: "health", price: 12000, isOffer: false }
+    // Se ha agregado la propiedad 'urlImagen'
+    { id: 8, idProducto: '1', name: "Creatina Monohidratada", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_CRTN_MONOHYDRATE.png" },
+    { id: 2, idProducto: '2', name: "Creatina Micronizada", tag: "Creatina", tagClass: "creatine", price: 22900, isOffer: false, urlImagen: "../images/2_CRTN_Micronized.png" },
+    { id: 6, idProducto: '3', name: "Botella Azul", tag: "Botella", tagClass: "bottle", price: 13900, isOffer: false, urlImagen: "../images/6_botella.jpeg" },
+    { id: 6, idProducto: '4', name: "Botella Morada", tag: "Botella", tagClass: "bottle", price: 17900, isOffer: false, urlImagen: "../images/6_botellaMorada.jpeg" }, 
+    { id: 6, idProducto: '5', name: "Botella Verde", tag: "Botella", tagClass: "bottle", price: 15900, isOffer: false, urlImagen: "../images/6_botellaVerde.jpeg" }, 
+    { id: 6, idProducto: '6', name: "Gatorade 4pack", tag: "Gatorade", tagClass: "gatorade", price: 3600, isOffer: false, urlImagen: "../images/6_gatorade.png" }, 
+    { id: 6, idProducto: '7', name: "Red Bull Pack", tag: "redbull", tagClass: "redbull", price: 4900, isOffer: false, urlImagen: "../images/6_redBull.png" }, 
+    { id: 1, idProducto: 'P002', name: "Caseína Chocolate", tag: "Noche", tagClass: "night", price: 32000, isOffer: false, urlImagen: "static/img/P002.jpg" },
+    { id: 3, idProducto: 'A001', name: "BCAAs Limón", tag: "Recuperación", tagClass: "recovery", price: 19500, isOffer: false, urlImagen: "static/img/A001.jpg" },
+    { id: 2, idProducto: 'C002', name: "Creatina Sab. Frutas", tag: "¡Oferta!", tagClass: "offer", price: 21000, newPrice: 17000, isOffer: true, urlImagen: "static/img/C002.jpg" },
+    { id: 4, idProducto: 'V001', name: "Multivitamínico Diario", tag: "Salud", tagClass: "health", price: 12000, isOffer: false, urlImagen: "static/img/V001.jpg" }
 ];
 
 // 2. CONFIGURACIÓN, CONSTANTES y SELECTORES DOM
 const WHATSAPP_NUMBER = '50688887777';
-const ALL_VARIANTS = ['1LB', '2LB', '3LB', '30 Serv', '60 Caps', '120 Caps', '5LB'];
+const ALL_VARIANTS = ['Disponibles'];
 
 // Credenciales y Token de Administración (SIMULADOS)
 const MASTER_USER = 'admin';
@@ -24,12 +29,13 @@ const AUTH_TOKEN_KEY = 'masterToken';
 
 // Simulación de Stock
 const simulatedStock = {
-    'P001': { '1LB': 3, '2LB': 0, '3LB': 10, '30 Serv': 1, '60 Caps': 0, '120 Caps': 5, '5LB': 0 },
-    'C001': { '1LB': 5, '2LB': 2, '3LB': 0, '30 Serv': 8, '60 Caps': 1, '120 Caps': 0, '5LB': 0 },
-    'P002': { '1LB': 1, '2LB': 4, '3LB': 6, '30 Serv': 2, '60 Caps': 1, '120 Caps': 3, '5LB': 0 },
-    'A001': { '1LB': 8, '2LB': 8, '3LB': 8, '30 Serv': 8, '60 Caps': 8, '120 Caps': 8, '5LB': 8 },
-    'C002': { '1LB': 2, '2LB': 5, '3LB': 7, '30 Serv': 3, '60 Caps': 0, '120 Caps': 1, '5LB': 0 },
-    'V001': { '1LB': 9, '2LB': 9, '3LB': 9, '30 Serv': 9, '60 Caps': 9, '120 Caps': 9, '5LB': 9 },
+    '1': { 'Disponibles': 0},
+    '2': { 'Disponibles': 3},
+    '3': { 'Disponibles': 5},
+    '4': { 'Disponibles': 1},
+    '5': { 'Disponibles': 8},
+    '6': { 'Disponibles': 2},
+    '7': { 'Disponibles': 9},
 };
 
 // Selectores del Modelo de Objeto de Documento (DOM)
@@ -63,16 +69,17 @@ const DOM = {
     adminFloatControls: document.getElementById('admin-controls-container'),
     editCatalogBtn: document.getElementById('edit-catalog-btn'),
     logoutBtn: document.getElementById('logout-btn'),
+    closeLoginFormBtn: document.querySelector('.close-login-btn'),
 
     adminModal: document.getElementById('adminModal'),
     closeAdminBtn: document.querySelector('.close-admin-btn'),
     adminPanel: document.getElementById('admin-panel'),
 
-    showAddFormBtn: document.getElementById('show-add-form-btn'),
-    showListBtn: document.getElementById('show-list-btn'),
-    addProductFormContainer: document.getElementById('add-product-form-container'),
+    // showAddFormBtn: document.getElementById('show-add-form-btn'), // ❌ ELIMINADO
+    showListBtn: document.getElementById('show-list-btn'), // Ahora será el botón principal de CRUD
+    addProductFormContainer: document.getElementById('add-product-form-container'), // Se usará para Añadir/Editar
     newProductForm: document.getElementById('new-product-form'),
-    editProductList: document.getElementById('edit-product-list'),
+    editProductList: document.getElementById('edit-product-list'), // Contenedor de la lista de productos
     newProductStockInputs: document.getElementById('new-product-stock-inputs'),
     newProductImageFile: document.getElementById('new-product-image-file'),
 };
@@ -105,6 +112,7 @@ function createProductCardHTML(product) {
         priceDisplay = `<div class="product-price">₡${formattedPrice}</div>`;
     }
 
+    // Usa la propiedad urlImagen para establecer el background-image
     const imageUrl = product.urlImagen ? product.urlImagen : '';
 
     return `
@@ -303,7 +311,6 @@ function handleLogin(event) {
 
         setTimeout(() => {
             toggleLoginForm(false);
-            showAdminControls(true);
         }, 500);
 
     } else {
@@ -337,12 +344,8 @@ function handleLogout() {
  * Inicializa la aplicación: verifica si hay un token almacenado.
  */
 function checkAuthOnLoad() {
-    const token = localStorage.getItem(AUTH_TOKEN_KEY);
-    if (token) {
-        showAdminControls(true);
-    } else {
-        showAdminControls(false);
-    }
+    // const token = localStorage.getItem(AUTH_TOKEN_KEY); // Ya no necesitamos verificar
+    showAdminControls(false); // Aseguramos que los controles flotantes estén ocultos
 }
 
 // =========================================================================
@@ -367,9 +370,13 @@ function generateStockInputs() {
 
 /**
  * Renderiza el listado de productos en la vista de administración (CRUD Read - Día 1 Frontend).
+ * Incluye el botón para AÑADIR NUEVO PRODUCTO en la cabecera.
  */
 function renderAdminProductList() {
     let listHTML = `
+        <div class="admin-list-header">
+            <h3>Lista de Productos</h3>
+        </div>
         <table class="admin-table">
             <thead>
                 <tr>
@@ -409,10 +416,39 @@ function renderAdminProductList() {
     `;
 
     DOM.editProductList.innerHTML = listHTML;
+    
+    // Asignar listener al nuevo botón "Añadir Producto" DENTRO de la lista
+    const addProductFromListBtn = document.getElementById('add-product-from-list-btn');
+    if (addProductFromListBtn) {
+        addProductFromListBtn.addEventListener('click', () => showAdminSection('add'));
+    }
+    
+    // Asignar listeners a los botones de Editar/Eliminar
+    DOM.editProductList.querySelectorAll('.edit-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const id = event.currentTarget.getAttribute('data-id');
+            // Aquí se llamaría a una función para cargar el formulario de editar
+            console.log(`Lógica de edición para producto: ${id}`);
+            showAdminSection('add', { mode: 'edit', id: id }); // Opcional: pasar un modo para reutilizar el formulario
+        });
+    });
+
+    DOM.editProductList.querySelectorAll('.delete-btn').forEach(btn => {
+        btn.addEventListener('click', (event) => {
+            const id = event.currentTarget.getAttribute('data-id');
+            if (confirm(`¿Estás seguro de que quieres eliminar el producto ${id}?`)) {
+                // Aquí se llamaría a la API de eliminación
+                console.log(`Lógica de eliminación para producto: ${id}`);
+                alert(`Producto ${id} eliminado (Simulación)`);
+                // Después de la eliminación real, se debe volver a renderizar la lista
+                renderAdminProductList();
+            }
+        });
+    });
 }
 
 /**
- * Abre el modal de administración flotante (CORREGIDO).
+ * Abre el modal de administración flotante.
  */
 function openAdminModal() {
     console.log('--- Intentando abrir el Modal de Administración ---');
@@ -422,19 +458,19 @@ function openAdminModal() {
     DOM.filterNavContainer.classList.add('hidden');
     DOM.footer.classList.add('hidden');
 
-    // FIX: Usar style.display para forzar la visibilidad del modal
+    // Usar style.display para forzar la visibilidad del modal
     DOM.adminModal.style.display = 'block';
 
-    // Inicializar el formulario y mostrar la sección por defecto (Agregar)
+    // Inicializar y mostrar la sección principal de GESTIÓN DE CATÁLOGO (LISTA)
     generateStockInputs();
-    showAdminSection('add');
+    showAdminSection('list'); // ✅ Carga directamente la lista de productos
 }
 
 /**
- * Cierra el modal de administración flotante y restaura la vista del cliente (CORREGIDO).
+ * Cierra el modal de administración flotante y restaura la vista del cliente.
  */
 function closeAdminModal() {
-    // FIX: Ocultar el modal usando style.display
+    // Ocultar el modal usando style.display
     DOM.adminModal.style.display = 'none';
 
     // Restaurar la interfaz de cliente
@@ -448,20 +484,28 @@ function closeAdminModal() {
  * Maneja el clic en el botón flotante de Editar Catálogo.
  */
 function handleEditCatalogClick() {
-    // Verificamos que se detecta el click
     console.log('CLICK detectado en botón "Editar Catálogo"');
     openAdminModal();
 }
 
 /**
- * Muestra una sección específica del panel de administración (Agregar o Listar).
+ * Muestra una sección específica del panel de administración (Agregar/Editar o Listar).
  */
-function showAdminSection(section) {
+function showAdminSection(section, options = {}) {
     DOM.addProductFormContainer.classList.add('hidden');
     DOM.editProductList.classList.add('hidden');
 
     if (section === 'add') {
         DOM.addProductFormContainer.classList.remove('hidden');
+        // Aquí puedes añadir lógica para cambiar el título del formulario (Agregar vs. Editar)
+        const formTitle = DOM.addProductFormContainer.querySelector('h3');
+        if (options.mode === 'edit') {
+            formTitle.textContent = `Editar Producto #${options.id}`;
+            // Aquí iría la lógica para cargar los datos del producto a editar
+            console.log(`Cargando datos para editar: ${options.id}`);
+        } else {
+            formTitle.textContent = 'Agregar Nuevo Producto';
+        }
     } else if (section === 'list') {
         DOM.editProductList.classList.remove('hidden');
         renderAdminProductList(); // Llama a la función de renderizado CRUD Read
@@ -483,13 +527,13 @@ function handleNewProductSubmit(event) {
     const formData = new FormData(DOM.newProductForm);
 
     console.log("SIMULACIÓN DE ENVÍO A API - Tipo de Envío: multipart/form-data");
-
+    
     // Lógica REAL de la Capa de Aplicación (Backend):
     // fetch('/api/auth/productos', { method: 'POST', body: formData, headers: { 'Authorization': 'Bearer ' + token } })
 
     alert(`¡Éxito! Producto ${formData.get('nombre')} listo para ser subido (Simulación).`);
     DOM.newProductForm.reset();
-    showAdminSection('list');
+    showAdminSection('list'); // Vuelve a la lista después de guardar
 }
 
 
@@ -510,6 +554,15 @@ function initializeApp() {
 
     // 3. Asignar Listeners de Interfaz de Cliente y Auth
     DOM.masterLoginForm.addEventListener('submit', handleLogin);
+
+
+    // --> NUEVO LISTENER: Cerrar el modal de Login
+    if (DOM.closeLoginFormBtn) {
+        DOM.closeLoginFormBtn.addEventListener('click', (event) => {
+            event.preventDefault(); // Evita que envíe el formulario si está dentro de <form>
+            toggleLoginForm(false); // Oculta el formulario de login
+        });
+    }
 
     // Listeners flotantes de Admin
     DOM.editCatalogBtn.addEventListener('click', handleEditCatalogClick);
@@ -541,16 +594,26 @@ function initializeApp() {
 
     // 4. Listeners del Panel de Admin (dentro del nuevo modal)
     DOM.newProductForm.addEventListener('submit', handleNewProductSubmit);
-    DOM.showAddFormBtn.addEventListener('click', () => showAdminSection('add'));
+    
+    // ❌ ELIMINADO: DOM.showAddFormBtn.addEventListener('click', () => showAdminSection('add'));
+    
+    // ✅ MODIFICADO: showListBtn ahora es el punto de entrada principal del CRUD
     DOM.showListBtn.addEventListener('click', () => showAdminSection('list'));
 
-    // 5. Listener para activar el login desde el botón flotante "Al detalle"
+    // 5. Listener para el botón flotante "Perfil Maestro"
     const floatingButton = document.querySelector('.floating-actions .action-btn:nth-child(1)');
     if (floatingButton) {
         floatingButton.addEventListener('click', (event) => {
-            if (!localStorage.getItem(AUTH_TOKEN_KEY)) {
-                event.preventDefault();
+            event.preventDefault(); // Evita cualquier acción por defecto
+            
+            const token = localStorage.getItem(AUTH_TOKEN_KEY);
+            
+            if (!token) {
+                // Caso 1: No logueado. Mostrar el formulario de Login
                 toggleLoginForm(true);
+            } else {
+                // Caso 2: Logueado. Actuar como un TOGGLE para mostrar/ocultar los controles
+                DOM.adminFloatControls.classList.toggle('hidden');
             }
         });
     }
