@@ -1,13 +1,76 @@
 -- Verificar si la base de datos existe y crearla si no
 IF NOT EXISTS (SELECT *
     FROM sys.databases
-    WHERE name = 'BD_Okami')
+    WHERE name = 'BD_Okamifit ')
 BEGIN
- CREATE DATABASE BD_Okami;
+    CREATE DATABASE BD_Okamifit
 END
 GO
 
-USE BD_Okami;
+USE BD_Okamifit 
 GO
 
--- 1. CREACIÓN DE TABLAS
+
+CREATE TABLE USUARIOS (
+    idUsuario INT IDENTITY(1,1) PRIMARY KEY,
+    nombreUsuario NVARCHAR(50) NOT NULL UNIQUE,
+    hashPassword VARBINARY(MAX) NOT NULL,
+    rol NVARCHAR(50) NOT NULL,
+	esBorrado BIT NOT NULL DEFAULT 0
+)
+
+
+CREATE TABLE CATEGORIAS (
+    idCategoria INT IDENTITY(1,1) PRIMARY KEY,
+    nombreCategoria NVARCHAR(50) NOT NULL,
+	esBorrado BIT NOT NULL DEFAULT 0
+)
+
+
+CREATE TABLE VARIANTES (
+    idVariante INT IDENTITY(1,1) PRIMARY KEY,
+    Presentacion NVARCHAR(50) NOT NULL,
+	Contenido NVARCHAR(50), 
+	Sabor NVARCHAR(50),
+	esBorrado BIT NOT NULL DEFAULT 0
+	
+)
+
+
+CREATE TABLE PRODUCTOS (
+    idProducto INT IDENTITY(1,1) PRIMARY KEY,
+    nombre NVARCHAR(100) NOT NULL,
+    precioBase INT NOT NULL,
+    descripcion NVARCHAR(MAX),
+    enOferta BIT DEFAULT 0,
+    idCategoria INT NOT NULL,
+	esBorrado BIT NOT NULL DEFAULT 0,
+    FOREIGN KEY (idCategoria) REFERENCES CATEGORIAS(idCategoria)
+)
+
+
+CREATE TABLE STOCK_VARIANTE (
+    idProducto INT NOT NULL,
+    idVariante INT NOT NULL,
+    cantidadStock INT NOT NULL,
+    PRIMARY KEY(idProducto, idVariante),
+    FOREIGN KEY(idProducto) REFERENCES PRODUCTOS(idProducto),
+    FOREIGN KEY(idVariante) REFERENCES VARIANTES(idVariante)
+)
+
+
+CREATE TABLE SESIONES (
+ id_sesion INT IDENTITY(1,1) PRIMARY KEY,
+ id_usuario INT NOT NULL,
+ token VARCHAR(255) NOT NULL UNIQUE,
+ fecha_inicio DATETIME DEFAULT GETDATE(),
+ fecha_expiracion DATETIME,
+ CONSTRAINT FK_sesiones_usuario FOREIGN KEY (id_usuario) REFERENCES USUARIOS(idUsuario)
+);
+
+
+select * from CATEGORIAS
+select * from PRODUCTOS
+select * from VARIANTES
+select * from STOCK_VARIANTE
+select * from USUARIOS
