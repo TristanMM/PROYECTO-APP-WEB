@@ -5,17 +5,27 @@
 // --- 1. BASE DE DATOS DE PRODUCTOS (SIMULADA) ---
 const productData = [
     // Se ha agregado la propiedad 'urlImagen'
-    { id: 8, idProducto: '1', name: "Creatina Monohidratada", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_CRTN_MONOHYDRATE.png" },
-    { id: 2, idProducto: '2', name: "Creatina Micronizada", tag: "Creatina", tagClass: "creatine", price: 22900, isOffer: false, urlImagen: "../images/2_CRTN_Micronized.png" },
-    { id: 6, idProducto: '3', name: "Botella Azul", tag: "Botella", tagClass: "bottle", price: 13900, isOffer: false, urlImagen: "../images/6_botella.jpeg" },
-    { id: 6, idProducto: '4', name: "Botella Morada", tag: "Botella", tagClass: "bottle", price: 17900, isOffer: false, urlImagen: "../images/6_botellaMorada.jpeg" }, 
-    { id: 6, idProducto: '5', name: "Botella Verde", tag: "Botella", tagClass: "bottle", price: 15900, isOffer: false, urlImagen: "../images/6_botellaVerde.jpeg" }, 
-    { id: 6, idProducto: '6', name: "Gatorade 4pack", tag: "Gatorade", tagClass: "gatorade", price: 3600, isOffer: false, urlImagen: "../images/6_gatorade.png" }, 
-    { id: 6, idProducto: '7', name: "Red Bull Pack", tag: "redbull", tagClass: "redbull", price: 4900, isOffer: false, urlImagen: "../images/6_redBull.png" }, 
-    { id: 1, idProducto: 'P002', name: "Caseína Chocolate", tag: "Noche", tagClass: "night", price: 32000, isOffer: false, urlImagen: "static/img/P002.jpg" },
-    { id: 3, idProducto: 'A001', name: "BCAAs Limón", tag: "Recuperación", tagClass: "recovery", price: 19500, isOffer: false, urlImagen: "static/img/A001.jpg" },
-    { id: 2, idProducto: 'C002', name: "Creatina Sab. Frutas", tag: "¡Oferta!", tagClass: "offer", price: 21000, newPrice: 17000, isOffer: true, urlImagen: "static/img/C002.jpg" },
-    { id: 4, idProducto: 'V001', name: "Multivitamínico Diario", tag: "Salud", tagClass: "health", price: 12000, isOffer: false, urlImagen: "static/img/V001.jpg" }
+    { id: 2, idProducto: '1', name: "Creatina Micronizada", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_creatine1.png" },
+    { id: 2, idProducto: '2', name: "Creatina Monohydrate", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_creatine2.png" },
+    { id: 1, idProducto: '3', name: "Proteina 1 Rule", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_protein1.png" },
+    { id: 1, idProducto: '4', name: "Proteina Classic All Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_protein2.png" },
+    { id: 1, idProducto: '5', name: "Proteina Isolate", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_proteine3.png" },
+    { id: 1, idProducto: '6', name: "Proteina Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_proteine4.png" },
+    { id: 3, idProducto: '7', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 29900, isOffer: false, urlImagen: "../images/3_MassGainer1.png" },
+    { id: 3, idProducto: '8', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 29900, isOffer: false, urlImagen: "../images/3_MassGainer2.png" },
+    { id: 4, idProducto: '9', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 29900, isOffer: false, urlImagen: "../images/4_aminoacido1.png" },
+    { id: 4, idProducto: '10', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 29900, isOffer: false, urlImagen: "../images/4_aminoacido2.png" },
+    { id: 5, idProducto: '11', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno1.png" },
+    { id: 5, idProducto: '12', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno2.png" },
+    { id: 5, idProducto: '13', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno3.png" },
+    { id: 6, idProducto: '14', name: "Glutamina", tag: "Catálogo Completo", tagClass: "glutamina", price: 29900, isOffer: false, urlImagen: "../images/6_glutamina1.png" },
+    { id: 7, idProducto: '15', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botella.png" },
+    { id: 7, idProducto: '16', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaMorada.png" },
+    { id: 7, idProducto: '17', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaVerde.png" },
+    { id: 8, idProducto: '18', name: "Colageno", tag: "Catálogo Completo", tagClass: "colageno", price: 29900, isOffer: false, urlImagen: "../images/8_colageno.png" },
+    { id: 7, idProducto: '19', name: "Gatorade", tag: "Catálogo Completo", tagClass: "gatorade", price: 29900, isOffer: false, urlImagen: "../images/9_gatorade.png" },
+    { id: 7, idProducto: '20', name: "Red Bull", tag: "Catálogo Completo", tagClass: "redBull", price: 29900, isOffer: false, urlImagen: "../images/9_redBull.png" }
+
 ];
 
 // 2. CONFIGURACIÓN, CONSTANTES y SELECTORES DOM
@@ -29,13 +39,13 @@ const AUTH_TOKEN_KEY = 'masterToken';
 
 // Simulación de Stock
 const simulatedStock = {
-    '1': { 'Disponibles': 0},
-    '2': { 'Disponibles': 3},
-    '3': { 'Disponibles': 5},
-    '4': { 'Disponibles': 1},
-    '5': { 'Disponibles': 8},
-    '6': { 'Disponibles': 2},
-    '7': { 'Disponibles': 9},
+    '1': { 'Disponibles': 0 },
+    '2': { 'Disponibles': 3 },
+    '3': { 'Disponibles': 5 },
+    '4': { 'Disponibles': 1 },
+    '5': { 'Disponibles': 8 },
+    '6': { 'Disponibles': 2 },
+    '7': { 'Disponibles': 9 },
 };
 
 // Selectores del Modelo de Objeto de Documento (DOM)
@@ -416,13 +426,13 @@ function renderAdminProductList() {
     `;
 
     DOM.editProductList.innerHTML = listHTML;
-    
+
     // Asignar listener al nuevo botón "Añadir Producto" DENTRO de la lista
     const addProductFromListBtn = document.getElementById('add-product-from-list-btn');
     if (addProductFromListBtn) {
         addProductFromListBtn.addEventListener('click', () => showAdminSection('add'));
     }
-    
+
     // Asignar listeners a los botones de Editar/Eliminar
     DOM.editProductList.querySelectorAll('.edit-btn').forEach(btn => {
         btn.addEventListener('click', (event) => {
@@ -527,7 +537,7 @@ function handleNewProductSubmit(event) {
     const formData = new FormData(DOM.newProductForm);
 
     console.log("SIMULACIÓN DE ENVÍO A API - Tipo de Envío: multipart/form-data");
-    
+
     // Lógica REAL de la Capa de Aplicación (Backend):
     // fetch('/api/auth/productos', { method: 'POST', body: formData, headers: { 'Authorization': 'Bearer ' + token } })
 
@@ -594,9 +604,9 @@ function initializeApp() {
 
     // 4. Listeners del Panel de Admin (dentro del nuevo modal)
     DOM.newProductForm.addEventListener('submit', handleNewProductSubmit);
-    
+
     // ❌ ELIMINADO: DOM.showAddFormBtn.addEventListener('click', () => showAdminSection('add'));
-    
+
     // ✅ MODIFICADO: showListBtn ahora es el punto de entrada principal del CRUD
     DOM.showListBtn.addEventListener('click', () => showAdminSection('list'));
 
@@ -605,9 +615,9 @@ function initializeApp() {
     if (floatingButton) {
         floatingButton.addEventListener('click', (event) => {
             event.preventDefault(); // Evita cualquier acción por defecto
-            
+
             const token = localStorage.getItem(AUTH_TOKEN_KEY);
-            
+
             if (!token) {
                 // Caso 1: No logueado. Mostrar el formulario de Login
                 toggleLoginForm(true);
