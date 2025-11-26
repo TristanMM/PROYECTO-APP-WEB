@@ -5,26 +5,26 @@
 // --- 1. BASE DE DATOS DE PRODUCTOS (SIMULADA) ---
 const productData = [
     // Se ha agregado la propiedad 'urlImagen'
-    { id: 2, idProducto: '1', name: "Creatina Micronizada", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_creatine1.png" },
-    { id: 2, idProducto: '2', name: "Creatina Monohydrate", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_creatine2.png" },
-    { id: 1, idProducto: '3', name: "Proteina 1 Rule", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_protein1.png" },
-    { id: 1, idProducto: '4', name: "Proteina Classic All Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_protein2.png" },
-    { id: 1, idProducto: '5', name: "Proteina Isolate", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_proteine3.png" },
-    { id: 1, idProducto: '6', name: "Proteina Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 29900, isOffer: false, urlImagen: "../images/1_proteine4.png" },
-    { id: 3, idProducto: '7', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 29900, isOffer: false, urlImagen: "../images/3_MassGainer1.png" },
-    { id: 3, idProducto: '8', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 29900, isOffer: false, urlImagen: "../images/3_MassGainer2.png" },
-    { id: 4, idProducto: '9', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 29900, isOffer: false, urlImagen: "../images/4_aminoacido1.png" },
-    { id: 4, idProducto: '10', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 29900, isOffer: false, urlImagen: "../images/4_aminoacido2.png" },
-    { id: 5, idProducto: '11', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno1.png" },
-    { id: 5, idProducto: '12', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno2.png" },
-    { id: 5, idProducto: '13', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno3.png" },
-    { id: 6, idProducto: '14', name: "Glutamina", tag: "Catálogo Completo", tagClass: "glutamina", price: 29900, isOffer: false, urlImagen: "../images/6_glutamina1.png" },
-    { id: 7, idProducto: '15', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botella.png" },
-    { id: 7, idProducto: '16', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaMorada.png" },
-    { id: 7, idProducto: '17', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaVerde.png" },
-    { id: 8, idProducto: '18', name: "Colageno", tag: "Catálogo Completo", tagClass: "colageno", price: 29900, isOffer: false, urlImagen: "../images/8_colageno.png" },
-    { id: 7, idProducto: '19', name: "Gatorade", tag: "Catálogo Completo", tagClass: "gatorade", price: 29900, isOffer: false, urlImagen: "../images/9_gatorade.png" },
-    { id: 7, idProducto: '20', name: "Red Bull", tag: "Catálogo Completo", tagClass: "redBull", price: 29900, isOffer: false, urlImagen: "../images/9_redBull.png" }
+    { id: 2, idProducto: '1', name: "Creatina Micronizada", tag: "Catálogo Completo", tagClass: "creatine", price: 22900, isOffer: false, urlImagen: "../images/2_creatine1.png" },
+    { id: 2, idProducto: '1', name: "Creatina Monohydrate", tag: "Catálogo Completo", tagClass: "creatine", price: 29900, isOffer: false, urlImagen: "../images/2_creatine2.png" },
+    { id: 1, idProducto: '1', name: "Proteina 1 Rule", tag: "Catálogo Completo", tagClass: "proteine", price: 51900, isOffer: false, urlImagen: "../images/1_protein1.png" },
+    { id: 1, idProducto: '1', name: "Proteina Classic All Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 43900, isOffer: false, urlImagen: "../images/1_protein2.png" },
+    { id: 1, idProducto: '1', name: "Proteina Isolate", tag: "Catálogo Completo", tagClass: "proteine", price: 51900, isOffer: false, urlImagen: "../images/1_proteine3.png" },
+    { id: 1, idProducto: '1', name: "Proteina Whey", tag: "Catálogo Completo", tagClass: "proteine", price: 41900, isOffer: false, urlImagen: "../images/1_proteine4.png" },
+    { id: 3, idProducto: '1', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 31900, isOffer: false, urlImagen: "../images/3_MassGainer1.png" },
+    { id: 3, idProducto: '1', name: "Mass Gainer", tag: "Catálogo Completo", tagClass: "massGainer", price: 25500, isOffer: false, urlImagen: "../images/3_MassGainer2.png" },
+    { id: 4, idProducto: '1', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 14900, isOffer: false, urlImagen: "../images/4_aminoacido1.png" },
+    { id: 4, idProducto: '1', name: "Aminoacido", tag: "Catálogo Completo", tagClass: "aminoacido", price: 18900, isOffer: false, urlImagen: "../images/4_aminoacido2.png" },
+    { id: 5, idProducto: '1', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno1.png" },
+    { id: 5, idProducto: '1', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno2.png" },
+    { id: 5, idProducto: '1', name: "Pre Entreno", tag: "Catálogo Completo", tagClass: "preEntreno", price: 29900, isOffer: false, urlImagen: "../images/5_preEntreno3.png" },
+    { id: 6, idProducto: '1', name: "Glutamina", tag: "Catálogo Completo", tagClass: "glutamina", price: 29900, isOffer: false, urlImagen: "../images/6_glutamina1.png" },
+    { id: 7, idProducto: '1', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botella.png" },
+    { id: 7, idProducto: '1', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaMorada.png" },
+    { id: 7, idProducto: '1', name: "botella", tag: "Catálogo Completo", tagClass: "botella", price: 29900, isOffer: false, urlImagen: "../images/7_botellaVerde.png" },
+    { id: 8, idProducto: '1', name: "Colageno", tag: "Catálogo Completo", tagClass: "colageno", price: 29900, isOffer: false, urlImagen: "../images/8_colageno.png" },
+    { id: 7, idProducto: '1', name: "Gatorade", tag: "Catálogo Completo", tagClass: "gatorade", price: 29900, isOffer: false, urlImagen: "../images/9_gatorade.png" },
+    { id: 7, idProducto: '1', name: "Red Bull", tag: "Catálogo Completo", tagClass: "redBull", price: 29900, isOffer: false, urlImagen: "../images/9_redBull.png" }
 
 ];
 
@@ -39,13 +39,7 @@ const AUTH_TOKEN_KEY = 'masterToken';
 
 // Simulación de Stock
 const simulatedStock = {
-    '1': { 'Disponibles': 0 },
-    '2': { 'Disponibles': 3 },
-    '3': { 'Disponibles': 5 },
-    '4': { 'Disponibles': 1 },
-    '5': { 'Disponibles': 8 },
-    '6': { 'Disponibles': 2 },
-    '7': { 'Disponibles': 9 },
+    '1': { 'Disponibles': 1 }
 };
 
 // Selectores del Modelo de Objeto de Documento (DOM)
