@@ -11,6 +11,10 @@ footer {
     background-color: var(--color-card-bg);
 }
 
+#show-list-btn {
+    display: none;
+}
+
 /* --- Botones Flotantes de Acción (e.g., WhatsApp) --- */
 .floating-actions {
     position: fixed;

@@ -33,7 +33,7 @@
             <section id="admin-panel" class="admin-panel-content">
                 <h2>Gestión de Catálogo 🛒</h2>
                 <div class="admin-menu">
-                    <button id="show-list-btn" class="action-btn primary">📝 Gestionar Productos</button>
+                    <button id="show-list-btn" class="action-btn primary">Regresar</button>
                 </div>
 
                 <div id="edit-product-list" class="admin-list-container hidden">
@@ -109,37 +109,44 @@
 
     <hr>
 
-   <footer>
-    <div class="footer-container">
-        <div class="footer-col brand-contact">
-            <h2>OKAMI FIT</h2>
-            <br><br>
-            <h3>Tu tienda de suplementos de confianza.</h3>
-            <h3>Contacto: +506 8756-8991</h3>
-            <br><br>
-            <br>
-            <ul class="social-links">
-                <li><a href="https://www.facebook.com/share/1Fv6RHfnec/?mibextid=wwXIfr" aria-label="Facebook">Facebook<i class="fab fa-facebook-f"></i></a></li>
-                <li><a href="https://www.instagram.com/okamifit_cr?igsh=MTZqbjd2ajRncmxhdA%3D%3D&utm_source=qr" aria-label="Instagram">Instagram<i class="fab fa-instagram"></i></a></li>
-                
-            </ul>
-        </div>
-
-        <div class="footer-col okami-links">
-            <h2 class="hidden-title">Okami</h2> <ul class="link-list">
+<footer>
+        <div class="footer-container">
+            <div class="footer-col brand-contact">
+                <h2>OKAMI FIT</h2>
+                <br><br>
+                <h3>Tu tienda de suplementos de confianza.</h3>
+                <h3>Contacto: ‪+506 8756-8991‬</h3>
+                <br><br>
                 <br>
-                <li><a href="#" onclick="openModal('quienes')">Quienes somos</a></li>
-                <br><br>
-                <li><a href="#" onclick="openModal('vision')">Visión</a></li>
+                <ul class="social-links">
+                    <li><a href="https://www.facebook.com/share/1Fv6RHfnec/?mibextid=wwXIfr"
+                            aria-label="Facebook">Facebook<i class="fab fa-facebook-f"></i></a></li>
+                    <li><a href="https://www.instagram.com/okamifit_cr?igsh=MTZqbjd2ajRncmxhdA%3D%3D&utm_source=qr"
+                            aria-label="Instagram">Instagram<i class="fab fa-instagram"></i></a></li>
 
-                <br><br>
-                <h2>Ubicación:</h2>
-                <h3>Nos ubicamos en Limón Centro y en San José, San Pedro.</h3>
-            </ul>
+                </ul>
+            </div>
+
+            <div class="footer-col okami-links">
+                <h2 class="hidden-title">Okami</h2>
+                <ul class="link-list">
+                    <br>
+                    <li><a href="#" onclick="openModal('quienes')">Quienes somos</a></li>
+                    <br>
+                    <li><a href="#" onclick="openModal('vision')">Visión</a></li>
+                    <br>
+                    <li> <a href="{{ url_for('static', filename='Manual.pdf') }}"
+                            target="_blank">
+                            Manual de Usuario
+                        </a></li>
+                    <br>
+                    <h2>Ubicación:</h2>
+                    <h3>Nos ubicamos en Limón Centro y en San José, San Pedro.</h3>
+                </ul>
+            </div>
         </div>
-    </div>
 
-</footer>
+    </footer>
 
     <div class="floating-actions">
         <button class="action-btn">Perfil Maestro</button>

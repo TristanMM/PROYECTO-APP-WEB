@@ -298,7 +298,7 @@ def api_crear_producto():
 
 
         cursor.execute("""
-            EXEC sp_Agregar_PRODUCTOS
+            EXEC sp_Agregar_PRODUCTOS1
                 @nombre=?,
                 @precioBase=?,
                 @descripcion=?,
@@ -460,10 +460,10 @@ def update_inventario_producto(idProducto):
             existing = cur.fetchone()
             if existing:
                 # actualizar
-                cur.execute("EXEC sp_Actualizar_STOCK_VARIANTE ?, ?, ?", (idProducto, idVar, cantidad))
+                cur.execute("EXEC sp_Actualizar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
             else:
                 # insertar
-                cur.execute("EXEC sp_Agregar_STOCK_VARIANTE ?, ?, ?", (idProducto, idVar, cantidad))
+                cur.execute("EXEC sp_Agregar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
         conn.commit()
         return jsonify({"success": True, "message": "Inventario actualizado"})
     except Exception as e:

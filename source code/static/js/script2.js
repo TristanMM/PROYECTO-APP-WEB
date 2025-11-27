@@ -567,24 +567,38 @@ function showAdminControls(show) {
 }
 
 function showAdminSection(section, options = {}) {
+    const manageBtn = document.getElementById("show-list-btn");
+
+    // Ocultar ambas secciones
     DOM.addProductFormContainer.classList.add('hidden');
     DOM.editProductList.classList.add('hidden');
 
     if (section === 'add') {
+        // Mostrar formulario
         DOM.addProductFormContainer.classList.remove('hidden');
+
         const formTitle = DOM.addProductFormContainer.querySelector('h3');
+
         if (options.mode === 'edit') {
             formTitle.textContent = `Editar Producto #${options.id}`;
         } else {
             formTitle.textContent = 'Agregar Nuevo Producto';
-            // limpiar marker de edit
             if (DOM.newProductForm) DOM.newProductForm.removeAttribute('data-edit-id');
         }
+
+        // MOSTRAR botón "Gestionar Productos"
+        manageBtn.style.display = "inline-block";
+
     } else if (section === 'list') {
+        // Mostrar lista
         DOM.editProductList.classList.remove('hidden');
         renderAdminProductList();
+
+        // OCULTAR botón "Gestionar Productos"
+        manageBtn.style.display = "none";
     }
 }
+
 
 
 // ====================== FORM HANDLERS (Crear / Editar) ======================
