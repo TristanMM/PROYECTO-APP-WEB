@@ -66,21 +66,23 @@ INSERT INTO STOCK_VARIANTE (idProducto, idVariante, cantidadStock) VALUES
 (4, 6, 80);
 GO
 
-EXEC sp_registrar_Usuario 'OscarFargas','Coquito007','Administrador'
+EXEC sp_registrar_Usuario1 'OscarFargas','Coquito007','Administrador'
 
-EXEC sp_validar_login 'OscarFargas', 'Coquito007'
+EXEC sp_validar_login1 'OscarFargas', 'Coquito007'
 
-EXEC sp_Agregar_CATEGORIAS 'PRUEBA 1'
-EXEC sp_Obtener_CATEGORIAS '1'
-EXEC sp_Actualizar_CATEGORIAS '6','Actualizado'
-EXEC sp_Eliminar_CATEGORIAS '6'
+EXEC sp_Agregar_CATEGORIAS1 'PRUEBA 1'
+EXEC sp_Obtener_CATEGORIAS1 '1'
+EXEC sp_Actualizar_CATEGORIAS1 '6','Actualizado'
+EXEC sp_Eliminar_CATEGORIAS1 '6'
 
-EXEC sp_Agregar_PRODUCTOS 'PRUEBA 1','11111','Esto es una prueba','1','1'
-EXEC sp_Obtener_PRODUCTOS '6'
-EXEC sp_Actualizar_PRODUCTOS '6','Actualizado','0000','Esto es una prueba','2','2'
-EXEC sp_Eliminar_PRODUCTOS '6'
+EXEC sp_Agregar_PRODUCTOS1 'PRUEBA 1','11111','Esto es una prueba','1','1'
+EXEC sp_Obtener_PRODUCTOS1 '1'
+EXEC sp_Actualizar_PRODUCTOS1 '6','Actualizado','0000','Esto es una prueba','2','2'
+EXEC sp_Eliminar_PRODUCTOS1 '6'
 
-EXEC sp_Agregar_VARIANTES 'LATA','1111 GM','SIN SABOR'
-EXEC sp_Obtener_VARIANTES '7'
-EXEC sp_Actualizar_VARIANTES '7', 'Actualizado','0000 GM','Con SABOR'
-EXEC sp_Eliminar_VARIANTES '7'
+EXEC sp_Agregar_VARIANTES1 'LATA','1111 GM','SABOR pn'
+EXEC sp_Obtener_VARIANTES1 '2'
+EXEC sp_Actualizar_VARIANTES1 '7', 'Actualizado','0000 GM','Con SABOR'
+EXEC sp_Eliminar_VARIANTES1 '7'
+
+EXEC sp_Validar_SESION1 '413330b0-b87f-457b-8146-f2f5757f39f0';

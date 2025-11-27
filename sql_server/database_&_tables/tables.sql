@@ -1,10 +1,4 @@
--- Verificar si la base de datos existe y crearla si no
-IF NOT EXISTS (SELECT *
-    FROM sys.databases
-    WHERE name = 'BD_Okamifit ')
-BEGIN
-    CREATE DATABASE BD_Okamifit
-END
+CREATE DATABASE BD_Okamifit
 GO
 
 USE BD_Okamifit 
@@ -19,13 +13,11 @@ CREATE TABLE USUARIOS (
 	esBorrado BIT NOT NULL DEFAULT 0
 )
 
-
 CREATE TABLE CATEGORIAS (
     idCategoria INT IDENTITY(1,1) PRIMARY KEY,
     nombreCategoria NVARCHAR(50) NOT NULL,
 	esBorrado BIT NOT NULL DEFAULT 0
 )
-
 
 CREATE TABLE VARIANTES (
     idVariante INT IDENTITY(1,1) PRIMARY KEY,
@@ -36,7 +28,6 @@ CREATE TABLE VARIANTES (
 	
 )
 
-
 CREATE TABLE PRODUCTOS (
     idProducto INT IDENTITY(1,1) PRIMARY KEY,
     nombre NVARCHAR(100) NOT NULL,
@@ -45,6 +36,7 @@ CREATE TABLE PRODUCTOS (
     enOferta BIT DEFAULT 0,
     idCategoria INT NOT NULL,
 	esBorrado BIT NOT NULL DEFAULT 0,
+	urlImagen NVARCHAR(MAX) NOT NULL,
     FOREIGN KEY (idCategoria) REFERENCES CATEGORIAS(idCategoria)
 )
 
@@ -58,19 +50,11 @@ CREATE TABLE STOCK_VARIANTE (
     FOREIGN KEY(idVariante) REFERENCES VARIANTES(idVariante)
 )
 
-
 CREATE TABLE SESIONES (
- id_sesion INT IDENTITY(1,1) PRIMARY KEY,
- id_usuario INT NOT NULL,
- token VARCHAR(255) NOT NULL UNIQUE,
- fecha_inicio DATETIME DEFAULT GETDATE(),
- fecha_expiracion DATETIME,
- CONSTRAINT FK_sesiones_usuario FOREIGN KEY (id_usuario) REFERENCES USUARIOS(idUsuario)
+ id_sesion INT IDENTITY(1,1) PRIMARY KEY,
+ id_usuario INT NOT NULL,
+ token VARCHAR(255) NOT NULL UNIQUE,
+ fecha_inicio DATETIME DEFAULT GETDATE(),
+ fecha_expiracion DATETIME,
+ CONSTRAINT FK_sesiones_usuario FOREIGN KEY (id_usuario) REFERENCES USUARIOS(idUsuario)
 );
-
-
-select * from CATEGORIAS
-select * from PRODUCTOS
-select * from VARIANTES
-select * from STOCK_VARIANTE
-select * from USUARIOS

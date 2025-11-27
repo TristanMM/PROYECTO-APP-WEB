@@ -1,13 +1,25 @@
 # Importacion de las librerias necesarias
-from flask import Flask, render_template, request, session, jsonify, redirect, url_for
+from flask import Flask, render_template, request, session, jsonify, redirect, url_for, send_from_directory
 import pyodbc
 import uuid
 import os
 from functools import wraps
 
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
+
+# Crear carpeta si no existe
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+
 # Aqui creamos la aplicacion usando el Framework Flask
 app = Flask(__name__)
 app.secret_key = "root123"
+
+# FIX PARA QUE DELETE ENVÍE LA COOKIE
+app.config["SESSION_COOKIE_SAMESITE"] = "None"
+app.config["SESSION_COOKIE_SECURE"] = True  # En producción cámbialo a True
+app.config["SESSION_COOKIE_HTTPONLY"] = True
+app.config["SESSION_PERMANENT"] = False
 
 SQL_SERVER_CONFIG = {
     "driver": "{ODBC Driver 17 for SQL Server}",
@@ -88,7 +100,7 @@ def login():
         cursor = conn.cursor()
 
         # Llamada al SP para validar login 
-        cursor.execute("{CALL sp_validar_login(?, ?)}", (correo, contrasena))
+        cursor.execute("{CALL sp_validar_login1(?, ?)}", (correo, contrasena))
         row = cursor.fetchone()
         r = row_to_dict_lower(row, cursor)
 
@@ -104,7 +116,7 @@ def login():
 
         # Crear token y registrar sesión
         token = str(uuid.uuid4())
-        cursor.execute("{CALL sp_Crear_SESION(?, ?, ?)}", (user_id, token, 30))
+        cursor.execute("{CALL sp_Crear_SESION1(?, ?, ?)}", (user_id, token, 30))
         conn.commit()
 
         # Guardar token en sesión Flask
@@ -132,7 +144,7 @@ def obtener_usuario_actual():
         cursor = conn.cursor()
 
         # Ejecutar el SP que valida la sesión en SQL Server
-        cursor.execute("{CALL sp_Validar_SESION(?)}", (token,))
+        cursor.execute("{CALL sp_Validar_SESION1(?)}", (token,))
         row = cursor.fetchone()
         r = row_to_dict_lower(row, cursor)
         # El SP retorna id_usuario
@@ -146,6 +158,16 @@ def obtener_usuario_actual():
     finally:
         conn.close()
 
+@app.route('/api/validar-sesion', methods=['GET'])
+def api_validar_sesion():
+    user_id = obtener_usuario_actual()
+
+    if user_id:
+        return jsonify({"success": True, "user_id": user_id})
+    else:
+        return jsonify({"success": False, "message": "No hay sesión activa"})
+
+
 @app.route("/logout", methods=["POST"])
 def logout():
     # Quitar token de la sesión
@@ -158,7 +180,7 @@ def logout():
                 cursor = conn.cursor()
 
                 # Llamar el SP para cerrar sesión en SQL Server
-                cursor.execute("{CALL sp_Cerrar_SESION(?)}", (token,))
+                cursor.execute("{CALL sp_Cerrar_SESION1(?)}", (token,))
                 conn.commit()
             except Exception as e:
                 print(f"Error al cerrar sesión en BD: {e}")
@@ -170,7 +192,9 @@ def logout():
 
 @app.route("/")
 def index():
-    return render_template("login_index.html")
+    return render_template("index.html")
+
+
 
 # -----------------------
 # MÓDULO CATÁLOGO (productos)
@@ -184,7 +208,7 @@ def get_productos():
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_PRODUCTOS ?, ?", (None, 0))
+        cur.execute("EXEC sp_Obtener_PRODUCTOS1 ?, ?", (None, 0))
         productos = rows_to_dicts(cur)
         return jsonify({"success": True, "data": productos})
     except Exception as e:
@@ -201,7 +225,7 @@ def get_producto(idProducto):
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_PRODUCTOS ?, ?", (idProducto, 0))
+        cur.execute("EXEC sp_Obtener_PRODUCTOS1 ?, ?", (idProducto, 0))
         productos = rows_to_dicts(cur)
         if not productos:
             return jsonify({"success": False, "message": "Producto no encontrado"}), 404
@@ -236,90 +260,109 @@ def get_productos_por_categoria(idCategoria):
         conn.close()
 
 # POST /api/productos
-@app.route("/api/productos", methods=["POST"])
-@admin_required
-def crear_producto():
-    payload = request.get_json()
-    nombre = payload.get("nombre")
-    precioBase = payload.get("precioBase")
-    descripcion = payload.get("descripcion")
-    enOferta = bool(payload.get("enOferta", False))
-    idCategoria = payload.get("idCategoria")
-    stock_list = payload.get("stock", [])
-
-    if not nombre or precioBase is None or idCategoria is None:
-        return jsonify({"success": False, "message": "Faltan campos obligatorios"}), 400
-
-    conn, _ = get_connection()
-    if not conn:
-        return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
-
+@app.route('/api/productos', methods=['POST'])
+def api_crear_producto():
     try:
-        cur = conn.cursor()
-        # Insertar producto
-        cur.execute("EXEC sp_Agregar_PRODUCTOS ?, ?, ?, ?, ?", (nombre, precioBase, descripcion, int(enOferta), idCategoria))
+        # ----------- Campos normales del form ------------
+        nombre = request.form.get("nombre")
+        precioBase = request.form.get("precioBase")
+        descripcion = request.form.get("descripcion")
+        enOferta = request.form.get("enOferta", "false") == "true"
+        idCategoria = request.form.get("idCategoria")
 
-        # Obtener idProducto recién creado
-        cur.execute("SELECT TOP (1) idProducto FROM PRODUCTOS WHERE nombre = ? AND idCategoria = ? ORDER BY idProducto DESC", (nombre, idCategoria))
-        row = cur.fetchone()
-        r = row_to_dict_lower(row, cur)
-        idProducto = r.get("idproducto") if r else None
+        # ----------- Imagen recibida ------------
+        imagen = request.files.get("imagenFile")
+        if imagen:
+            # Guarda la imagen en carpeta /uploads
+            uploads_path = os.path.join("uploads", imagen.filename)
+            imagen.save(uploads_path)
+            urlImagen = imagen.filename
+        else:
+            urlImagen = None
 
-        # Insertar stock inicial si se proporciona
-        for item in stock_list:
-            idVariante = item.get("idVariante")
-            cantidad = item.get("cantidadStock", 0)
-            if idProducto and idVariante is not None:
-                cur.execute("EXEC sp_Agregar_STOCK_VARIANTE ?, ?, ?", (idProducto, idVariante, cantidad))
+        # ------------------ DEBUGGING ------------------
+        print("DATA RECIBIDA FORM:", request.form)
+        print("ARCHIVO RECIBIDO:", imagen)
+        print("URL IMAGEN GENERADA:", urlImagen)
+        # ------------------------------------------------
+
+        # ----------- Validación ------------
+        if not nombre or not precioBase or not idCategoria or not urlImagen:
+            return jsonify({"success": False, "message": "Faltan campos obligatorios"}), 400
+
+        # ----------- Guardar en BD ------------
+        conn, _ = get_connection()   # ← recibe ambos valores
+        cursor = conn.cursor()
+
+        print("Nombre enviado a la BD:", urlImagen)
+
+
+        cursor.execute("""
+            EXEC sp_Agregar_PRODUCTOS
+                @nombre=?,
+                @precioBase=?,
+                @descripcion=?,
+                @enOferta=?,
+                @idCategoria=?,
+                @urlImagen=?
+        """, (nombre, precioBase, descripcion, 1 if enOferta else 0, idCategoria, urlImagen))
 
         conn.commit()
-        return jsonify({"success": True, "message": "Producto creado", "idProducto": idProducto})
-    except Exception as e:
-        conn.rollback()
-        print("ERROR POST /api/productos:", e)
-        return jsonify({"success": False, "message": str(e)}), 500
-    finally:
-        conn.close()
 
-# PUT /api/productos/<idProducto>
+        return jsonify({"success": True})
+
+    except Exception as e:
+        print("Error creando producto:", e)
+        return jsonify({"success": False, "message": "Error interno"}), 500
+
 @app.route("/api/productos/<int:idProducto>", methods=["PUT"])
-@admin_required
 def actualizar_producto(idProducto):
-    payload = request.get_json()
-    nombre = payload.get("nombre")
-    precioBase = payload.get("precioBase")
-    descripcion = payload.get("descripcion")
-    enOferta = bool(payload.get("enOferta", False))
-    idCategoria = payload.get("idCategoria")
+    nombre = request.form.get("nombre")
+    precioBase = request.form.get("precioBase")
+    descripcion = request.form.get("descripcion")
+    enOferta = request.form.get("enOferta") == "true"
+    idCategoria = request.form.get("idCategoria")
+
+    # Imagen opcional
+    imagen = request.files.get("imagenFile")
+    if imagen:
+        uploads_path = os.path.join("uploads", imagen.filename)
+        imagen.save(uploads_path)
+        urlImagen = imagen.filename
+    else:
+        urlImagen = None  # NO obligar
 
     if not nombre or precioBase is None or idCategoria is None:
-        return jsonify({"success": False, "message": "Faltan campos obligatorios"}), 400
+        return jsonify({"success": False, "message": "Faltan campos"}), 400
 
     conn, _ = get_connection()
-    if not conn:
-        return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Actualizar_PRODUCTOS ?, ?, ?, ?, ?, ?", (idProducto, nombre, precioBase, descripcion, int(enOferta), idCategoria))
+        cur.execute("""
+            EXEC sp_Actualizar_PRODUCTOS1 ?, ?, ?, ?, ?, ?, ?
+        """, (idProducto, nombre, precioBase, descripcion, int(enOferta), idCategoria, urlImagen))
         conn.commit()
-        return jsonify({"success": True, "message": "Producto actualizado"})
+
+        return jsonify({"success": True})
     except Exception as e:
         conn.rollback()
-        print("ERROR PUT /api/productos:", e)
+        print("ERROR PUT:", e)
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         conn.close()
+
 
 # DELETE /api/productos/<idProducto>
 @app.route("/api/productos/<int:idProducto>", methods=["DELETE"])
-@admin_required
+#@admin_required
 def eliminar_producto(idProducto):
+    print("SESSION:", session)
     conn, _ = get_connection()
     if not conn:
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Eliminar_PRODUCTOS ?", (idProducto,))
+        cur.execute("EXEC sp_Eliminar_PRODUCTOS1 ?", (idProducto,))
         conn.commit()
         return jsonify({"success": True, "message": "Producto eliminado (borrado lógico)"})
     except Exception as e:
@@ -341,7 +384,7 @@ def get_categorias():
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_CATEGORIAS ?, ?", (None, 0))
+        cur.execute("EXEC sp_Obtener_CATEGORIAS1 ?, ?", (None, 0))
         categorias = rows_to_dicts(cur)
         return jsonify({"success": True, "data": categorias})
     except Exception as e:
@@ -358,7 +401,7 @@ def get_variantes():
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_VARIANTES ?, ?", (None, 0))
+        cur.execute("EXEC sp_Obtener_VARIANTES1 ?, ?", (None, 0))
         variantes = rows_to_dicts(cur)
         return jsonify({"success": True, "data": variantes})
     except Exception as e:
@@ -375,7 +418,7 @@ def get_inventario_producto(idProducto):
         return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
     try:
         cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_STOCK_VARIANTE ?, ?", (idProducto, None))
+        cur.execute("EXEC sp_Obtener_STOCK_VARIANTE1 ?, ?", (idProducto, None))
         stock = rows_to_dicts(cur)
         return jsonify({"success": True, "data": stock})
     except Exception as e:
@@ -429,6 +472,38 @@ def update_inventario_producto(idProducto):
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         conn.close()
+
+# SUBIR IMAGEN
+@app.route("/api/upload-image", methods=["POST"])
+def upload_image():
+    try:
+        if "imagen" not in request.files:
+            return jsonify({"success": False, "message": "No se envió la imagen"}), 400
+
+        file = request.files["imagen"]
+
+        filename = file.filename
+        save_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        file.save(save_path)
+
+        # la URL que usa el frontend
+        url = f"/uploads/{filename}"
+
+        return jsonify({"success": True, "url": url})
+
+        print("Nombre archivo guardado realmente:", filename)
+
+    except Exception as e:
+        print("Error subiendo imagen:", e)
+        return jsonify({"success": False, "message": "Error interno"}), 500
+
+
+@app.route('/uploads/<path:filename>')
+def serve_uploads(filename):
+    return send_from_directory('uploads', filename)
+
+
 
 # -----------------------
 # RUN

@@ -1,63 +1,69 @@
-USE BD_Okamifit 
+Use BD_Okamifit
 GO
 
-CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Root12345'
 
+CREATE MASTER KEY ENCRYPTION BY PASSWORD = 'Root12345';
+GO
 
-CREATE CERTIFICATE CertificadoProyecto WITH SUBJECT = 'Certificado para encriptar datos del proyecto'
-
-
+CREATE CERTIFICATE CertificadoProyecto 
+WITH SUBJECT = 'Certificado para encriptar datos del proyecto';
+GO
 
 CREATE SYMMETRIC KEY ClaveSimetricaProyecto
 WITH ALGORITHM = AES_256
-ENCRYPTION BY CERTIFICATE CertificadoProyecto
+ENCRYPTION BY CERTIFICATE CertificadoProyecto;
+GO
 
 
-CREATE OR ALTER PROCEDURE sp_registrar_Usuario
+
+CREATE OR ALTER PROCEDURE sp_registrar_Usuario1
     @nombre NVARCHAR(50),
     @contrasena VARCHAR(255),
-	@rol NVARCHAR (50)
+    @rol NVARCHAR (50)
 AS
 BEGIN
     SET NOCOUNT ON;
     DECLARE @id_usuario_nuevo INT;
     DECLARE @contrasena_encriptada VARBINARY(MAX);
 
-    -- Abrimos la clave simétrica para poder usarla
     OPEN SYMMETRIC KEY ClaveSimetricaProyecto DECRYPTION BY CERTIFICATE CertificadoProyecto;
 
-    -- Encriptamos la contraseña
     SET @contrasena_encriptada = ENCRYPTBYKEY(KEY_GUID('ClaveSimetricaProyecto'), @contrasena);
 
-    -- Cerramos la clave
     CLOSE SYMMETRIC KEY ClaveSimetricaProyecto;
 
-    -- Usamos una transacción para asegurar la integridad de los datos
     BEGIN TRY
         BEGIN TRANSACTION;
 
-        INSERT INTO USUARIOS(nombreUsuario,hashPassword,rol) VALUES (@nombre,@contrasena_encriptada,@rol);
+        INSERT INTO USUARIOS(nombreUsuario, hashPassword, rol)
+        VALUES (@nombre, @contrasena_encriptada, @rol);
+
         SET @id_usuario_nuevo = SCOPE_IDENTITY();
 
-        
         COMMIT TRANSACTION;
-        SELECT 1 AS 'Success', 'Usuario registrado correctamente' AS 'Message', @id_usuario_nuevo AS 'CustomerID';
+
+        SELECT 
+            1 AS Success, 
+            'Usuario registrado correctamente' AS Message,
+            @id_usuario_nuevo AS CustomerID;
     END TRY
     BEGIN CATCH
-        -- Si algo falla, revertimos todos los cambios
         IF @@TRANCOUNT > 0
             ROLLBACK TRANSACTION;
-        
-        SELECT 0 AS 'Success', ERROR_MESSAGE() AS 'Message', -1 AS 'CustomerID';
+
+        SELECT 
+            0 AS Success,
+            ERROR_MESSAGE() AS Message,
+            -1 AS CustomerID;
     END CATCH
 END
-
+GO
 
 
 
 
 -- Procedimiento para validar el login de un usuario
-CREATE OR ALTER PROCEDURE sp_validar_login
+CREATE OR ALTER PROCEDURE sp_validar_login1
     @nombreUsuario VARCHAR(50),
     @contrasena VARCHAR(255)
 AS
@@ -93,11 +99,8 @@ BEGIN
     END CATCH
 END
 
-
-
-
 -- Procedimiento para crear la sesion de un usuario
-CREATE OR ALTER PROCEDURE sp_Crear_SESION
+CREATE OR ALTER PROCEDURE sp_Crear_SESION1
     @id_usuario INT,
     @token VARCHAR(255),
     @minutos_expiracion INT
@@ -124,7 +127,7 @@ BEGIN
 END
 
 -- Procedimiento para validar un token de sesión y obtener el ID de usuario
-CREATE OR ALTER PROCEDURE sp_Validar_SESION
+CREATE OR ALTER PROCEDURE sp_Validar_SESION1
     @token VARCHAR(255)
 AS
 BEGIN
@@ -136,7 +139,7 @@ END
 
 
 -- Procedimiento para cerrar una sesión
-CREATE OR ALTER PROCEDURE sp_Cerrar_SESION
+CREATE OR ALTER PROCEDURE sp_Cerrar_SESION1
     @token VARCHAR(255)
 AS
 BEGIN
@@ -152,7 +155,7 @@ END
 
 --****************************CATEGORIAS***********************
 
-CREATE OR ALTER PROCEDURE sp_Agregar_CATEGORIAS
+CREATE OR ALTER PROCEDURE sp_Agregar_CATEGORIAS1
     @nombreCategoria NVARCHAR(50)
 AS
 BEGIN
@@ -163,7 +166,7 @@ GO
 
 
 -- R: Obtener (Filtra los registros borrados por defecto)
-CREATE OR ALTER PROCEDURE sp_Obtener_CATEGORIAS
+CREATE OR ALTER PROCEDURE sp_Obtener_CATEGORIAS1
     @idCategoria INT = NULL,
     @incluirBorrados BIT = 0
 AS
@@ -176,7 +179,7 @@ END
 
 
 -- U: Actualizar
-CREATE OR ALTER PROCEDURE sp_Actualizar_CATEGORIAS
+CREATE OR ALTER PROCEDURE sp_Actualizar_CATEGORIAS1
     @idCategoria INT,
     @nombreCategoria NVARCHAR(50)
 AS
@@ -188,7 +191,7 @@ END
 
 
 -- D: Eliminar (Borrado Lógico)
-CREATE OR ALTER PROCEDURE sp_Eliminar_CATEGORIAS
+CREATE OR ALTER PROCEDURE sp_Eliminar_CATEGORIAS1
     @idCategoria INT
 AS
 BEGIN
@@ -201,7 +204,7 @@ END
 --************************************VARIANTES***************************
 
 -- C: Insertar
-CREATE OR ALTER PROCEDURE sp_Agregar_VARIANTES
+CREATE OR ALTER PROCEDURE sp_Agregar_VARIANTES1
     @Presentacion NVARCHAR(50),
     @Contenido NVARCHAR(50),
     @Sabor NVARCHAR(50)
@@ -213,7 +216,7 @@ END
 
 
 -- R: Obtener (Filtra los registros borrados por defecto)
-CREATE OR ALTER PROCEDURE sp_Obtener_VARIANTES
+CREATE OR ALTER PROCEDURE sp_Obtener_VARIANTES1
     @idVariante INT = NULL,
     @incluirBorrados BIT = 0
 AS
@@ -226,7 +229,7 @@ END
 
 
 -- U: Actualizar
-CREATE OR ALTER PROCEDURE sp_Actualizar_VARIANTES
+CREATE OR ALTER PROCEDURE sp_Actualizar_VARIANTES1
     @idVariante INT,
     @Presentacion NVARCHAR(50),
     @Contenido NVARCHAR(50),
@@ -242,7 +245,7 @@ END
 
 
 -- D: Eliminar (Borrado Lógico)
-CREATE OR ALTER PROCEDURE sp_Eliminar_VARIANTES
+CREATE OR ALTER PROCEDURE sp_Eliminar_VARIANTES1
     @idVariante INT
 AS
 BEGIN
@@ -255,21 +258,23 @@ END
 
 --****************************************PRODUCTOS********************
 -- C: Insertar
-CREATE OR ALTER PROCEDURE sp_Agregar_PRODUCTOS
+CREATE OR ALTER PROCEDURE sp_Agregar_PRODUCTOS1
     @nombre NVARCHAR(100),
     @precioBase INT,
     @descripcion NVARCHAR(MAX),
     @enOferta BIT,
-    @idCategoria INT
+    @idCategoria INT,
+    @urlImagen NVARCHAR(MAX) -- Debe ser provisto, ya que es NOT NULL
 AS
 BEGIN
-    INSERT INTO PRODUCTOS (nombre, precioBase, descripcion, enOferta, idCategoria)
-    VALUES (@nombre, @precioBase, @descripcion, @enOferta, @idCategoria);
+    INSERT INTO PRODUCTOS (nombre, precioBase, descripcion, enOferta, idCategoria, urlImagen)
+    VALUES (@nombre, @precioBase, @descripcion, @enOferta, @idCategoria, @urlImagen);
 END
 
 
+
 -- R: Obtener (Filtra los productos borrados por defecto)
-CREATE OR ALTER PROCEDURE sp_Obtener_PRODUCTOS
+CREATE OR ALTER PROCEDURE sp_Obtener_PRODUCTOS1
     @idProducto INT = NULL,
     @incluirBorrados BIT = 0
 AS
@@ -280,6 +285,7 @@ BEGIN
         P.precioBase, 
         P.descripcion, 
         P.enOferta, 
+        P.urlImagen, -- Nueva columna
         C.nombreCategoria,
         P.esBorrado
     FROM PRODUCTOS P
@@ -289,14 +295,17 @@ BEGIN
 END
 
 
+
+
 -- U: Actualizar
-CREATE OR ALTER PROCEDURE sp_Actualizar_PRODUCTOS
+CREATE OR ALTER PROCEDURE sp_Actualizar_PRODUCTOS1
     @idProducto INT,
     @nombre NVARCHAR(100),
     @precioBase INT,
     @descripcion NVARCHAR(MAX),
     @enOferta BIT,
-    @idCategoria INT
+    @idCategoria INT,
+    @urlImagen NVARCHAR(MAX) -- Debe ser provisto, ya que es NOT NULL
 AS
 BEGIN
     UPDATE PRODUCTOS
@@ -304,13 +313,15 @@ BEGIN
         precioBase = @precioBase,
         descripcion = @descripcion,
         enOferta = @enOferta,
-        idCategoria = @idCategoria
+        idCategoria = @idCategoria,
+        urlImagen = @urlImagen -- Actualización del campo obligatorio
     WHERE idProducto = @idProducto;
 END
 
 
+
 -- D: Eliminar (Borrado Lógico)
-CREATE OR ALTER PROCEDURE sp_Eliminar_PRODUCTOS
+CREATE OR ALTER PROCEDURE sp_Eliminar_PRODUCTOS1
     @idProducto INT
 AS
 BEGIN
@@ -320,13 +331,13 @@ BEGIN
     WHERE idProducto = @idProducto;
     
     -- Nota: En este esquema, no es necesario actualizar STOCK_VARIANTE, 
-    -- ya que el filtro en PRODUCTOS se encargará de "ocultar" su stock asociado.
+    -- ya que el filtro en PRODUCTOS se encargará de "ocultar" su stock asociado.
 END
 
 
 --***************************STOCK****************************
 -- C: Insertar
-CREATE OR ALTER PROCEDURE sp_Agregar_STOCK_VARIANTE
+CREATE OR ALTER PROCEDURE sp_Agregar_STOCK_VARIANTE1
     @idProducto INT,
     @idVariante INT,
     @cantidadStock INT
@@ -338,7 +349,7 @@ END
 
 
 -- R: Obtener (Filtra el stock de productos que NO están borrados)
-CREATE OR ALTER PROCEDURE sp_Obtener_STOCK_VARIANTE
+CREATE OR ALTER PROCEDURE sp_Obtener_STOCK_VARIANTE1
     @idProducto INT = NULL,
     @idVariante INT = NULL
 AS
@@ -361,7 +372,7 @@ END
 
 
 -- U: Actualizar
-CREATE OR ALTER PROCEDURE sp_Actualizar_STOCK_VARIANTE
+CREATE OR ALTER PROCEDURE sp_Actualizar_STOCK_VARIANTE1
     @idProducto INT,
     @idVariante INT,
     @cantidadStock INT
@@ -374,7 +385,7 @@ END
 
 
 -- D: Eliminar (Borrado Físico - Es común en tablas de enlace si la cantidad llega a cero, pero aquí lo mantendremos como físico si se quiere retirar la variante completamente)
-CREATE OR ALTER PROCEDURE sp_Eliminar_STOCK_VARIANTE
+CREATE OR ALTER PROCEDURE sp_Eliminar_STOCK_VARIANTE1
     @idProducto INT,
     @idVariante INT
 AS
@@ -383,4 +394,3 @@ BEGIN
     DELETE FROM STOCK_VARIANTE
     WHERE idProducto = @idProducto AND idVariante = @idVariante;
 END
-

@@ -1,0 +1,85 @@
+/* ======================================= */
+/* 02-HEADER-NAV.CSS: Header y Navegación */
+/* ======================================= */
+
+/* --- Header Principal y Navegación --- */
+
+.header-content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 5%;
+    width: 100%;
+}
+
+.logo {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: var(--color-primary);
+}
+
+.main-nav a {
+    text-decoration: none;
+    color: var(--color-text);
+    margin-left: 20px;
+    font-size: 0.95em;
+    font-weight: 500;
+}
+
+.cart-icon {
+    font-size: 1.5em;
+    cursor: pointer;
+}
+
+
+/* --- Banner dentro del Header --- */
+/* Elimina márgenes globales del body para permitir full width */
+body {
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor del banner a pantalla completa */
+.header-banner {
+    width: 100vw;        /* ocupa todo el ancho visible */
+    margin-left: calc(50% - 50vw); /* evita que se limite por contenedores centrados */
+    margin-right: calc(50% - 50vw);
+}
+
+/* Imagen del banner */
+.header-banner img {
+    width: 100%;         /* ocupa el 100% del contenedor */
+    height: auto;
+    display: block;
+    object-fit: cover;
+}
+
+
+/* --- Barra de Categorías / Filtros --- */
+.filter-nav-container {
+    background-color: var(--color-primary);
+    padding: 10px 0;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.filter-nav {
+    display: flex;
+    justify-content: center;
+    padding: 0 5%;
+}
+
+.filter-nav a {
+    text-decoration: none;
+    color: white;
+    padding: 5px 15px;
+    margin: 0 5px;
+    border-radius: 4px;
+    font-size: 0.9em;
+    transition: background-color 0.3s;
+}
+
+.filter-nav a.active,
+.filter-nav a:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+}
