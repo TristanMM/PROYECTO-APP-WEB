@@ -1,20 +1,14 @@
-/* ======================================= */
-/* 00-BASE.CSS: Variables, Reset y Globales */
-/* ======================================= */
-
-/* --- Variables Globales --- */
 :root {
-    --color-primary: #201e1e; /* Azul Oscuro - Branding */
-    --color-accent: #ff0000;  /* Rojo Brillante - Ofertas */
-    --color-text: #333;       /* Color de texto principal */
-    --color-bg-light: #f9f9f9;/* Fondo de la página */
-    --color-card-bg: #ffffff; /* Fondo de las tarjetas */
-    --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.1);    /* Sombra base */
-    --shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.15);  /* Sombra al pasar el ratón */
-    --border-radius: 8px;     /* Borde de tarjetas */
+    --color-primary: #201e1e;
+    --color-accent: #ff0000;
+    --color-text: #333;
+    --color-bg-light: #f9f9f9;
+    --color-card-bg: #ffffff;
+    --shadow-light: 0 2px 5px rgba(0, 0, 0, 0.1);
+    --shadow-hover: 0 4px 10px rgba(0, 0, 0, 0.15);
+    --border-radius: 8px;
 }
 
-/* --- Reset Básico --- */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -28,7 +22,6 @@ body {
     line-height: 1.6;
 }
 
-/* --- Elementos Genéricos --- */
 hr {
     border: 0;
     border-top: 1px solid #ddd;

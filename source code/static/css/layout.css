@@ -1,8 +1,3 @@
-/* ======================================= */
-/* 01-LAYOUT.CSS: Estructura y Grid */
-/* ======================================= */
-
-/* --- Contenedor Principal de la Página --- */
 .products-grid-container {
     padding: 30px 5%;
 }
@@ -13,52 +8,43 @@
     color: var(--color-primary);
 }
 
-/* --- Grid de Productos (Layout) --- */
-/* Dentro de 01-layout.css */
 .products-grid {
     display: grid;
-    /* Define 4 columnas fijas que ocupan el mismo tamaño (1fr) */
-    grid-template-columns: repeat(4, 1fr); 
+    grid-template-columns: repeat(4, 1fr);
     gap: 25px;
 }
 
-/* ========================================= */
-/* ESTILOS DEL FOOTER (Basado en image_921fbe.png) */
-/* ========================================= */
-
 footer {
-    background-color: white; /* Fondo blanco para contraste */
-    color: #333; /* Texto oscuro */
-    padding: 40px 0 20px 0; /* Más padding vertical */
+    background-color: white;
+    color: #333;
+    padding: 40px 0 20px 0;
     font-size: 14px;
-    border-top: 1px solid #eee; /* Separador sutil */
+    border-top: 1px solid #eee;
 }
 
 .footer-container {
-    max-width: 1200px; /* Ajusta a tu ancho de contenido principal */
+    max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
     display: flex;
-    justify-content: space-between; /* Separa las dos columnas principales */
+    justify-content: space-between;
     align-items: flex-start;
-    flex-wrap: wrap; /* Para manejo en móviles */
+    flex-wrap: wrap;
 }
 
 .footer-col {
     margin-bottom: 20px;
 }
 
-/* --- Columna de Marca y Contacto --- */
-
 .brand-contact h2 {
     font-size: 18px;
     font-weight: bold;
-    margin-bottom: 30px; /* Espacio debajo del título OKAMI FIT */
+    margin-bottom: 30px;
 }
 
 .brand-contact .contact-title {
     font-weight: bold;
-    margin-bottom: 15px; /* Espacio sobre los íconos sociales */
+    margin-bottom: 15px;
 }
 
 .social-links {
@@ -66,30 +52,26 @@ footer {
     padding: 0;
     margin: 0;
     display: flex;
-    gap: 15px; /* Espacio entre los íconos */
+    gap: 15px;
 }
 
 .social-links a {
-    color: #888; /* Color gris para los íconos */
+    color: #888;
     font-size: 18px;
     text-decoration: none;
     transition: color 0.2s;
 }
 
 .social-links a:hover {
-    color: var(--color-accent, #5cb85c); /* Usar tu color de acento o un gris más oscuro */
+    color: var(--color-accent, #5cb85c);
 }
 
-/* --- Columna de Enlaces --- */
-
 .okami-links {
-    /* Ocupa el espacio a la derecha */
-    text-align: left; 
+    text-align: left;
 }
 
 .okami-links .hidden-title {
-    /* Oculta el título h2 de Okami, si solo necesitas la lista */
-    display: none; 
+    display: none;
 }
 
 .link-list {
@@ -113,7 +95,6 @@ footer {
     color: #000;
 }
 
-/* Asegurar el alineamiento vertical con el diseño */
 .brand-contact {
     width: 50%;
     text-align: left;
@@ -122,13 +103,12 @@ footer {
 .okami-links {
     width: 50%;
 }
+
 .okami-links .link-list li:first-child a {
-    /* Estilo especial si "Okami" es un título/enlace */
-    font-weight: normal; 
+    font-weight: normal;
     margin-top: 0;
 }
 
-/* --- Sección de Copyright --- */
 .footer-bottom {
     text-align: center;
     margin-top: 40px;

@@ -1,9 +1,3 @@
-/* ======================================= */
-/* 02-HEADER-NAV.CSS: Header y Navegación */
-/* ======================================= */
-
-/* --- Header Principal y Navegación --- */
-
 .header-content-wrapper {
     display: flex;
     justify-content: space-between;
@@ -31,31 +25,24 @@
     cursor: pointer;
 }
 
-
-/* --- Banner dentro del Header --- */
-/* Elimina márgenes globales del body para permitir full width */
 body {
     margin: 0;
     padding: 0;
 }
 
-/* Contenedor del banner a pantalla completa */
 .header-banner {
-    width: 100vw;        /* ocupa todo el ancho visible */
-    margin-left: calc(50% - 50vw); /* evita que se limite por contenedores centrados */
+    width: 100vw;
+    margin-left: calc(50% - 50vw);
     margin-right: calc(50% - 50vw);
 }
 
-/* Imagen del banner */
 .header-banner img {
-    width: 100%;         /* ocupa el 100% del contenedor */
+    width: 100%;
     height: auto;
     display: block;
     object-fit: cover;
 }
 
-
-/* --- Barra de Categorías / Filtros --- */
 .filter-nav-container {
     background-color: var(--color-primary);
     padding: 10px 0;

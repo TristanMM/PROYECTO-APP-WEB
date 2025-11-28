@@ -1,18 +1,12 @@
-// script.js: LÓGICA PRINCIPAL DEL E-COMMERCE Y PANEL DE ADMINISTRACIÓN (CONEXIÓN A API)
-// =========================================================================
-
-// 0. CONFIG & ESTADO GLOBAL
 const API_BASE = "http://127.0.0.1:5000";
 const WHATSAPP_NUMBER = '50688887777';
-const ALL_VARIANTS = ['Disponibles']; // si en el futuro traes variantes reales, se sustituye
-const AUTH_TOKEN_KEY = 'masterToken'; // ya no usado para la auth real pero lo mantenemos por compatibilidad
+const ALL_VARIANTS = ['Disponibles'];
+const AUTH_TOKEN_KEY = 'masterToken';
 
-// Estado en memoria (será llenado desde la API)
 let products = [];
 let categories = [];
 let variants = [];
 
-// Selectores DOM (igual que tu versión original)
 const DOM = {
     // Cliente
     productsGrid: document.querySelector('.products-grid'),
@@ -21,7 +15,6 @@ const DOM = {
     filterNavContainer: document.querySelector('.filter-nav-container'),
     floatingActions: document.querySelector('.floating-actions'),
     footer: document.querySelector('footer'),
-
     // Modal de Cliente
     modal: document.getElementById('productModal'),
     closeBtnTop: document.querySelector('.close-btn'),
@@ -31,14 +24,12 @@ const DOM = {
     modalProductName: document.getElementById('modal-product-name'),
     modalPrice: document.getElementById('modal-price'),
     modalDescription: document.getElementById('modal-description'),
-
     // Admin
     loginFormContainer: document.getElementById('login-form-container'),
     masterLoginForm: document.getElementById('master-login-form'),
     loginUsername: document.getElementById('login-username'),
     loginPassword: document.getElementById('login-password'),
     loginMessage: document.getElementById('login-message'),
-
     // Selectores para Botones Flotantes y Modal de Admin
     adminFloatControls: document.getElementById('admin-controls-container'),
     editCatalogBtn: document.getElementById('edit-catalog-btn'),
@@ -57,11 +48,9 @@ const DOM = {
     newProductImageFile: document.getElementById('new-product-image-file'),
 };
 
-// Variables auxiliares del modal
 let currentProduct = null;
 let selectedVariant = null;
 
-// ====================== Helpers ======================
 
 function safeLowerClass(str) {
     if (!str) return '';
@@ -74,34 +63,28 @@ function formatPrice(value) {
 }
 
 function defaultImageFor(idProducto) {
-    // Si no hay url en la DB, intenta una ruta por id o imagen default
     return `/images/product_${idProducto}.png`;
 }
 
-// ====================== API CALLS ======================
 
 async function apiFetch(path, opts = {}) {
     const url = `${API_BASE}${path}`;
     const defaultOpts = {
-        credentials: "include", // enviar cookies (sesión)
+        credentials: "include",
         headers: {}
     };
     const finalOpts = Object.assign({}, defaultOpts, opts);
 
-    // Si body es objeto y no es FormData, setear JSON header
     if (finalOpts.body && !(finalOpts.body instanceof FormData) && !finalOpts.headers['Content-Type']) {
         finalOpts.headers['Content-Type'] = 'application/json';
     }
     try {
         const res = await fetch(url, finalOpts);
-        // Si es un redirect HTML (logout redirige al index), fetch seguirá el redirect.
-        // Intentamos parsear JSON si lo hay, si no devolveremos { success: false, message: ... }
         const text = await res.text();
         try {
             const json = JSON.parse(text);
             return { ok: res.ok, status: res.status, json };
         } catch {
-            // no JSON
             return { ok: res.ok, status: res.status, text };
         }
     } catch (err) {
@@ -117,10 +100,8 @@ async function loadProducts() {
         return;
     }
     const data = r.json || r.text;
-    // tu API responde { success: true, data: [...] } (según lo que mostraste)
     const payload = r.json || {};
     const list = payload.data || [];
-    // Mapear cada item al formato esperado por el frontend
     products = list.map(item => {
         const mapped = {
             id: item.idproducto || item.idProducto || item.id || null,
@@ -133,7 +114,6 @@ async function loadProducts() {
             descripcion: item.descripcion || '',
             esBorrado: !!item.esborrado,
             nombreCategoria: item.nombrecategoria || '',
-            // URL de imagen: usamos la propiedad urlimagen si existe (opción A), si no fallback
             urlImagen: item.urlimagen || item.urlImagen || defaultImageFor(item.idproducto || item.idProducto || item.id)
         };
         return mapped;
@@ -154,7 +134,6 @@ async function loadCategories() {
     } else {
         categories = [];
     }
-    // poblar selects si existen (por ejemplo en el formulario add product)
     fillCategorySelects();
 }
 
@@ -168,7 +147,6 @@ async function loadVariants() {
 
 }
 
-// Create product (POST)
 async function apiCreateProduct(payload) {
     const formData = new FormData();
     formData.append("nombre", payload.nombre);
@@ -202,7 +180,6 @@ async function apiUpdateProduct(idProducto, payload) {
     formData.append("enOferta", payload.enOferta);
     formData.append("idCategoria", payload.idCategoria);
 
-    // Solo si hay nueva imagen
     if (payload.imagenFile) {
         formData.append("imagenFile", payload.imagenFile);
     }
@@ -217,16 +194,14 @@ async function apiUpdateProduct(idProducto, payload) {
 }
 
 
-// Delete product (DELETE)
 async function apiDeleteProduct(idProducto) {
     const r = await apiFetch(`/api/productos/${idProducto}`, {
         method: "DELETE",
-        credentials: "include"   // ← NECESARIO para enviar cookies de sesión
+        credentials: "include"  
     });
     return r;
 }
 
-// ====================== RENDER & UI ======================
 
 function createProductCardHTML(product) {
     const formattedPrice = (product.price || 0).toLocaleString();
@@ -279,8 +254,6 @@ function handleFilterClick(event) {
     renderProducts(filteredProducts);
 }
 
-// ====================== MODAL & WHATSAPP ======================
-
 function openProductModal(product) {
     currentProduct = product;
     selectedVariant = null;
@@ -303,12 +276,10 @@ function openProductModal(product) {
 
 async function fillModalStock(product) {
     DOM.stockContainer.innerHTML = '';
-    // Intentar traer stock real para este producto
     try {
         const r = await apiFetch(`/api/inventario/${product.idProducto}`, { method: "GET" });
         if (r.ok && r.json && Array.isArray(r.json.data) && r.json.data.length > 0) {
             const stockRows = r.json.data;
-            // stockRows contienen: idProducto, NombreProducto, idVariante, Presentacion, Contenido, Sabor, cantidadStock
             stockRows.forEach(row => {
                 const variantLabel = (row.presentacion || row.presentacion || 'Disponibles');
                 const count = row.cantidadstock || row.cantidadStock || 0;
@@ -376,8 +347,6 @@ function redirectToWhatsApp() {
     closeProductModal();
 }
 
-// ====================== AUTH (login/logout usando API) ======================
-
 async function handleLogin(event) {
     event.preventDefault();
     const username = DOM.loginUsername.value.trim();
@@ -398,10 +367,8 @@ async function handleLogin(event) {
         if (payload.success) {
             DOM.loginMessage.textContent = "Inicio de sesión exitoso.";
             DOM.loginMessage.style.color = "green";
-            // mostrar controles admin
             showAdminControls(true);
             setTimeout(() => toggleLoginForm(false), 400);
-            // recargar lista de productos (para ver cambios admin)
             await loadProducts();
         } else {
             DOM.loginMessage.textContent = payload.message || "Credenciales incorrectas";
@@ -422,7 +389,6 @@ async function handleLogout() {
     } finally {
         showAdminControls(false);
         alert("Sesión cerrada. Regresando a la vista pública.");
-        // recargar productos como público
         await loadProducts();
     }
 }
@@ -438,9 +404,6 @@ function toggleLoginForm(show) {
 }
 
 function checkAuthOnLoad() {
-    // No usamos localStorage para auth: intentamos validar la sesión con el backend pidiendo /api/validar-sesion
-    // Para no cambiar el backend si no existe el endpoint de validación, intentamos una llamada simple que dependa de la cookie:
-    // Usaremos /api/validar-sesion si existe; si no, asumimos no autenticado.
     (async () => {
         try {
             const r = await apiFetch("/api/validar-sesion", { method: "GET" });
@@ -455,12 +418,7 @@ function checkAuthOnLoad() {
     })();
 }
 
-// ====================== ADMIN PANEL (CRUD) ======================
-
-
-
 function fillCategorySelects() {
-    // si el formulario tiene un select de categoria, lo rellenamos
     const select = DOM.newProductForm ? DOM.newProductForm.querySelector('select[name="categoria"]') : null;
     if (!select) return;
     select.innerHTML = `<option value="">-- Seleccione categoría --</option>`;
@@ -543,21 +501,18 @@ function renderAdminProductList() {
 }
 
 async function openEditProductForm(idProducto) {
-    // Cargar datos del producto y rellenar el formulario; cambiar el modo a edit
     const product = products.find(p => String(p.idProducto) === String(idProducto));
     if (!product) {
         alert("Producto no encontrado en memoria");
         return;
     }
     showAdminSection('add', { mode: 'edit', id: idProducto });
-    // rellenar campos del formulario si existen
     if (!DOM.newProductForm) return;
     DOM.newProductForm.querySelector('[name="nombre"]').value = product.name || '';
     DOM.newProductForm.querySelector('[name="precio"]').value = product.price || '';
     DOM.newProductForm.querySelector('[name="descripcion"]').value = product.descripcion || '';
     const catSelect = DOM.newProductForm.querySelector('[name="categoria"]');
     if (catSelect) catSelect.value = product.idCategoria || product.categoria || '';
-    // almacenar idProducto en el form para saber que estamos editando
     DOM.newProductForm.setAttribute('data-edit-id', idProducto);
 }
 
@@ -569,12 +524,10 @@ function showAdminControls(show) {
 function showAdminSection(section, options = {}) {
     const manageBtn = document.getElementById("show-list-btn");
 
-    // Ocultar ambas secciones
     DOM.addProductFormContainer.classList.add('hidden');
     DOM.editProductList.classList.add('hidden');
 
     if (section === 'add') {
-        // Mostrar formulario
         DOM.addProductFormContainer.classList.remove('hidden');
 
         const formTitle = DOM.addProductFormContainer.querySelector('h3');
@@ -586,22 +539,15 @@ function showAdminSection(section, options = {}) {
             if (DOM.newProductForm) DOM.newProductForm.removeAttribute('data-edit-id');
         }
 
-        // MOSTRAR botón "Gestionar Productos"
         manageBtn.style.display = "inline-block";
 
     } else if (section === 'list') {
-        // Mostrar lista
         DOM.editProductList.classList.remove('hidden');
         renderAdminProductList();
 
-        // OCULTAR botón "Gestionar Productos"
         manageBtn.style.display = "none";
     }
 }
-
-
-
-// ====================== FORM HANDLERS (Crear / Editar) ======================
 
 async function handleNewProductSubmit(event) {
     event.preventDefault();
@@ -665,18 +611,12 @@ async function handleNewProductSubmit(event) {
     }
 }
 
-
-
-// ====================== INICIALIZACIÓN ======================
-
 function initializeApp() {
-    // Cargar datos iniciales
     checkAuthOnLoad();
-    loadCategories(); // cargar categorias para selects
-    loadVariants();   // cargar variantes si existen
-    loadProducts();   // finalmente cargar productos
+    loadCategories(); 
+    loadVariants();   
+    loadProducts();  
 
-    // Listeners
     if (DOM.masterLoginForm) DOM.masterLoginForm.addEventListener('submit', handleLogin);
     if (DOM.closeLoginFormBtn) DOM.closeLoginFormBtn.addEventListener('click', (e) => { e.preventDefault(); toggleLoginForm(false); });
 
@@ -701,20 +641,15 @@ function initializeApp() {
     if (DOM.newProductForm) DOM.newProductForm.addEventListener('submit', handleNewProductSubmit);
     if (DOM.showListBtn) DOM.showListBtn.addEventListener('click', () => showAdminSection('list'));
 
-    // Floating button (perfil maestro)
     const floatingButton = document.querySelector('.floating-actions .action-btn:nth-child(1)');
     if (floatingButton) {
         floatingButton.addEventListener('click', (event) => {
             event.preventDefault();
-            // Intentar toggle de login/admin controls
-            // Si aún no autenticado, mostrar formulario
-            // Reutilizamos checkAuthOnLoad para decidir si mostramos o no
             toggleLoginForm(true);
         });
     }
 }
 
-// Admin modal open/close
 function openAdminModal() {
     DOM.productsGridContainer.classList.add('hidden');
     DOM.filterNavContainer.classList.add('hidden');
