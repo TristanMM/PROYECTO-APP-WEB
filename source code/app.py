@@ -1,4 +1,3 @@
-# Importacion de las librerias necesarias
 from flask import Flask, render_template, request, session, jsonify, redirect, url_for, send_from_directory
 import pyodbc
 import uuid
@@ -8,14 +7,11 @@ from functools import wraps
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
-# Crear carpeta si no existe
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
-# Aqui creamos la aplicacion usando el Framework Flask
 app = Flask(__name__)
 app.secret_key = "root123"
 
-# FIX PARA QUE DELETE ENVÍE LA COOKIE
 app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = True  # En producción cámbialo a True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
@@ -43,7 +39,6 @@ def get_connection():
         print(f"❌ FALLO CRÍTICO: SQL Server está caído: {ex}")
         return None, None
 
-# --- Helpers para convertir filas/resultsets a dict ---
 def row_to_dict_lower(row, cursor):
     """Convierte una fila pyodbc (fetchone) y cursor.description a dict con claves en minúscula."""
     if not row:
@@ -56,7 +51,6 @@ def rows_to_dicts(cursor):
     cols = [c[0] for c in cursor.description] if cursor.description else []
     return [{col.lower(): val for col, val in zip(cols, row)} for row in cursor.fetchall()]
 
-# decorador de seguridad para administrador
 def admin_required(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -80,8 +74,6 @@ def admin_required(func):
         finally:
             conn.close()
     return wrapper
-
-# --- Autenticación / sesiones ---
 
 @app.route("/login", methods=["POST"])
 def login():
@@ -143,11 +135,11 @@ def obtener_usuario_actual():
     try:
         cursor = conn.cursor()
 
-        # Ejecutar el SP que valida la sesión en SQL Server
+
         cursor.execute("{CALL sp_Validar_SESION1(?)}", (token,))
         row = cursor.fetchone()
         r = row_to_dict_lower(row, cursor)
-        # El SP retorna id_usuario
+
         user_id = r.get("id_usuario") if r else None
         return user_id
 
@@ -167,10 +159,8 @@ def api_validar_sesion():
     else:
         return jsonify({"success": False, "message": "No hay sesión activa"})
 
-
 @app.route("/logout", methods=["POST"])
 def logout():
-    # Quitar token de la sesión
     token = session.pop("token", None)
 
     if token:
@@ -179,7 +169,6 @@ def logout():
             try:
                 cursor = conn.cursor()
 
-                # Llamar el SP para cerrar sesión en SQL Server
                 cursor.execute("{CALL sp_Cerrar_SESION1(?)}", (token,))
                 conn.commit()
             except Exception as e:
@@ -187,20 +176,12 @@ def logout():
             finally:
                 conn.close()
 
-    # Redirigir al index después de cerrar sesión
     return redirect(url_for("index"))
 
 @app.route("/")
 def index():
     return render_template("index.html")
 
-
-
-# -----------------------
-# MÓDULO CATÁLOGO (productos)
-# -----------------------
-
-# GET /api/productos
 @app.route("/api/productos", methods=["GET"])
 def get_productos():
     conn, _ = get_connection()
@@ -217,7 +198,6 @@ def get_productos():
     finally:
         conn.close()
 
-# GET /api/productos/<idProducto>
 @app.route("/api/productos/<int:idProducto>", methods=["GET"])
 def get_producto(idProducto):
     conn, _ = get_connection()
@@ -236,7 +216,6 @@ def get_producto(idProducto):
     finally:
         conn.close()
 
-# GET /api/productos/categoria/<idCategoria>
 @app.route("/api/productos/categoria/<int:idCategoria>", methods=["GET"])
 def get_productos_por_categoria(idCategoria):
     conn, _ = get_connection()
@@ -259,11 +238,10 @@ def get_productos_por_categoria(idCategoria):
     finally:
         conn.close()
 
-# POST /api/productos
+
 @app.route('/api/productos', methods=['POST'])
 def api_crear_producto():
     try:
-        # ----------- Campos normales del form ------------
         nombre = request.form.get("nombre")
         precioBase = request.form.get("precioBase")
         descripcion = request.form.get("descripcion")
@@ -271,28 +249,23 @@ def api_crear_producto():
         idCategoria = request.form.get("idCategoria")
         stock = request.form.get("stock")
 
-        # ----------- Imagen recibida ------------
         imagen = request.files.get("imagenFile")
         if imagen:
-            # Guarda la imagen en carpeta /uploads
+
             uploads_path = os.path.join("uploads", imagen.filename)
             imagen.save(uploads_path)
             urlImagen = imagen.filename
         else:
             urlImagen = None
 
-        # ------------------ DEBUGGING ------------------
         print("DATA RECIBIDA FORM:", request.form)
         print("ARCHIVO RECIBIDO:", imagen)
         print("URL IMAGEN GENERADA:", urlImagen)
-        # ------------------------------------------------
 
-        # ----------- Validación ------------
         if not nombre or not precioBase or not idCategoria or not urlImagen:
             return jsonify({"success": False, "message": "Faltan campos obligatorios"}), 400
 
-        # ----------- Guardar en BD ------------
-        conn, _ = get_connection()   # ← recibe ambos valores
+        conn, _ = get_connection()  
         cursor = conn.cursor()
 
         print("Nombre enviado a la BD:", urlImagen)
@@ -326,14 +299,13 @@ def actualizar_producto(idProducto):
     enOferta = request.form.get("enOferta") == "true"
     idCategoria = request.form.get("idCategoria")
 
-    # Imagen opcional
     imagen = request.files.get("imagenFile")
     if imagen:
         uploads_path = os.path.join("uploads", imagen.filename)
         imagen.save(uploads_path)
         urlImagen = imagen.filename
     else:
-        urlImagen = None  # NO obligar
+        urlImagen = None 
 
     if not nombre or precioBase is None or idCategoria is None:
         return jsonify({"success": False, "message": "Faltan campos"}), 400
@@ -355,9 +327,7 @@ def actualizar_producto(idProducto):
         conn.close()
 
 
-# DELETE /api/productos/<idProducto>
 @app.route("/api/productos/<int:idProducto>", methods=["DELETE"])
-#@admin_required
 def eliminar_producto(idProducto):
     print("SESSION:", session)
     conn, _ = get_connection()
@@ -375,11 +345,7 @@ def eliminar_producto(idProducto):
     finally:
         conn.close()
 
-# -----------------------
-# MÓDULO INVENTARIO (categorias, variantes, stock)
-# -----------------------
 
-# GET /api/categorias
 @app.route("/api/categorias", methods=["GET"])
 def get_categorias():
     conn, _ = get_connection()
@@ -396,7 +362,6 @@ def get_categorias():
     finally:
         conn.close()
 
-# GET /api/variantes
 @app.route("/api/variantes", methods=["GET"])
 def get_variantes():
     conn, _ = get_connection()
@@ -413,7 +378,7 @@ def get_variantes():
     finally:
         conn.close()
 
-# GET /api/inventario/<idProducto>
+
 @app.route("/api/inventario/<int:idProducto>", methods=["GET"])
 def get_inventario_producto(idProducto):
     conn, _ = get_connection()
@@ -430,7 +395,7 @@ def get_inventario_producto(idProducto):
     finally:
         conn.close()
 
-# PUT /api/inventario/<idProducto>
+
 @app.route("/api/inventario/<int:idProducto>", methods=["PUT"])
 @admin_required
 def update_inventario_producto(idProducto):
@@ -458,14 +423,11 @@ def update_inventario_producto(idProducto):
             if idVar is None:
                 continue
 
-            # verificar si ya existe registro
             cur.execute("SELECT cantidadStock FROM STOCK_VARIANTE WHERE idProducto = ? AND idVariante = ?", (idProducto, idVar))
             existing = cur.fetchone()
             if existing:
-                # actualizar
                 cur.execute("EXEC sp_Actualizar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
             else:
-                # insertar
                 cur.execute("EXEC sp_Agregar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
         conn.commit()
         return jsonify({"success": True, "message": "Inventario actualizado"})
@@ -476,7 +438,6 @@ def update_inventario_producto(idProducto):
     finally:
         conn.close()
 
-# SUBIR IMAGEN
 @app.route("/api/upload-image", methods=["POST"])
 def upload_image():
     try:
@@ -490,7 +451,6 @@ def upload_image():
 
         file.save(save_path)
 
-        # la URL que usa el frontend
         url = f"/uploads/{filename}"
 
         return jsonify({"success": True, "url": url})
@@ -506,10 +466,5 @@ def upload_image():
 def serve_uploads(filename):
     return send_from_directory('uploads', filename)
 
-
-
-# -----------------------
-# RUN
-# -----------------------
 if __name__ == "__main__":
     app.run(debug=True)
