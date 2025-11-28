@@ -269,6 +269,7 @@ def api_crear_producto():
         descripcion = request.form.get("descripcion")
         enOferta = request.form.get("enOferta", "false") == "true"
         idCategoria = request.form.get("idCategoria")
+        stock = request.form.get("stock")
 
         # ----------- Imagen recibida ------------
         imagen = request.files.get("imagenFile")
@@ -298,14 +299,16 @@ def api_crear_producto():
 
 
         cursor.execute("""
-            EXEC sp_Agregar_PRODUCTOS1
-                @nombre=?,
-                @precioBase=?,
-                @descripcion=?,
-                @enOferta=?,
-                @idCategoria=?,
-                @urlImagen=?
-        """, (nombre, precioBase, descripcion, 1 if enOferta else 0, idCategoria, urlImagen))
+    EXEC sp_Agregar_PRODUCTOS1
+        @nombre=?,
+        @precioBase=?,
+        @descripcion=?,
+        @enOferta=?,
+        @idCategoria=?,
+        @urlImagen=?,
+        @stock=?
+""", (nombre, precioBase, descripcion, 1 if enOferta else 0, idCategoria, urlImagen, stock))
+
 
         conn.commit()
 

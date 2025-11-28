@@ -165,19 +165,33 @@ async function loadVariants() {
     } else {
         variants = [];
     }
-    // generar inputs de stock según ALL_VARIANTS o variantes reales
-    generateStockInputs();
+
 }
 
 // Create product (POST)
 async function apiCreateProduct(payload) {
-    // payload = { nombre, precioBase, descripcion, enOferta, idCategoria, stock: [...] }
-    const r = await apiFetch("/api/productos", {
+    const formData = new FormData();
+    formData.append("nombre", payload.nombre);
+    formData.append("precioBase", payload.precioBase);
+    formData.append("descripcion", payload.descripcion);
+    formData.append("enOferta", payload.enOferta);
+    formData.append("idCategoria", payload.idCategoria);
+    fformData.append("stock", document.getElementById("new-product-stock").value);
+
+
+    if (payload.imagenFile) {
+        formData.append("imagenFile", payload.imagenFile);
+    }
+
+    const r = await fetch("/api/productos", {
         method: "POST",
-        body: JSON.stringify(payload)
+        body: formData,
+        credentials: "include"
     });
-    return r;
+
+    return await r.json();
 }
+
 
 async function apiUpdateProduct(idProducto, payload) {
 
@@ -443,21 +457,7 @@ function checkAuthOnLoad() {
 
 // ====================== ADMIN PANEL (CRUD) ======================
 
-function generateStockInputs() {
-    // Si tienes variants reales (variants array), úsalas; si no, ALL_VARIANTS
-    const source = (variants && variants.length) ? variants.map(v => v.presentacion || v.Presentacion || `Var${v.idvariante || v.idVariante || v.id}`) : ALL_VARIANTS;
-    let html = '';
-    source.forEach(variant => {
-        const safeId = `stock-${String(variant).replace(/\s+/g, '-')}`;
-        html += `
-            <div class="stock-input-group">
-                <label for="${safeId}">${variant}</label>
-                <input type="number" id="${safeId}" name="stock_${variant}" min="0" value="0">
-            </div>
-        `;
-    });
-    DOM.newProductStockInputs.innerHTML = html;
-}
+
 
 function fillCategorySelects() {
     // si el formulario tiene un select de categoria, lo rellenamos
@@ -720,7 +720,6 @@ function openAdminModal() {
     DOM.filterNavContainer.classList.add('hidden');
     DOM.footer.classList.add('hidden');
     DOM.adminModal.style.display = 'block';
-    generateStockInputs();
     showAdminSection('list');
 }
 function closeAdminModal() {
