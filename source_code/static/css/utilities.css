@@ -1,0 +1,196 @@
+footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 0.8em;
+    color: #666;
+    background-color: var(--color-card-bg);
+}
+
+#show-list-btn {
+    display: none;
+}
+
+.floating-actions {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 1000;
+}
+
+.action-btn {
+    background-color: #5a5a5a;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.3s;
+}
+
+.action-btn.primary {
+    background-color: #25d366;
+}
+
+.modal-actions .action-btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+}
+
+.modal-actions .secondary {
+    background-color: #5a5a5a;
+}
+
+.modal-actions .primary {
+    background-color: var(--color-accent);
+}
+
+#add-to-cart-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+    color: #666666;
+    box-shadow: none;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.login-form {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: var(--color-card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-hover);
+    z-index: 3000;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    max-width: 350px;
+    width: 90%;
+}
+
+.login-form input[type="text"],
+.login-form input[type="password"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.login-form button[type="submit"] {
+    background-color: var(--color-primary);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.login-form button[type="submit"]:hover {
+    background-color: #004c99;
+}
+
+.error-message {
+    color: var(--color-accent);
+    text-align: center;
+    font-size: 0.9em;
+}
+
+#admin-panel {
+    min-height: 80vh;
+    padding-top: 50px;
+    background-color: #f0f0f0;
+}
+
+.admin-menu {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-bottom: 30px;
+}
+
+.crud-form {
+    background-color: var(--color-card-bg);
+    padding: 30px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-light);
+    max-width: 600px;
+    margin: 0 auto 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+}
+
+.crud-form h4 {
+    grid-column: 1 / -1;
+    margin-top: 10px;
+    color: var(--color-primary);
+}
+
+.crud-form label {
+    grid-column: 1 / -1;
+    font-weight: 700;
+    margin-top: 10px;
+}
+
+.crud-form input[type="text"],
+.crud-form input[type="number"],
+.crud-form button[type="submit"] {
+    grid-column: 1 / -1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.crud-form button[type="submit"] {
+    margin-top: 20px;
+}
+
+.stock-inputs-grid {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    padding: 10px;
+    border: 1px dashed #ccc;
+    border-radius: 4px;
+}
+
+.stock-input-group {
+    display: flex;
+    flex-direction: column;
+    width: calc(33.33% - 10px);
+    min-width: 80px;
+}
+
+.stock-input-group label {
+    font-weight: 500;
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.stock-input-group input {
+    width: 100%;
+    padding: 5px;
+    text-align: center;
+}
+
+@media (max-width: 600px) {
+    .crud-form {
+        grid-template-columns: 1fr;
+    }
+
+    .stock-input-group {
+        width: calc(50% - 10px);
+    }
+}
