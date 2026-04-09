@@ -1,5 +1,5 @@
 const API_BASE = "http://127.0.0.1:5000";
-const WHATSAPP_NUMBER = '50688887777';
+const WHATSAPP_NUMBER = '50689381855';
 const ALL_VARIANTS = ['Disponibles'];
 const AUTH_TOKEN_KEY = 'masterToken';
 
@@ -99,29 +99,32 @@ async function loadProducts() {
         console.error("Error cargando productos:", r);
         return;
     }
-    const data = r.json || r.text;
     const payload = r.json || {};
     const list = payload.data || [];
-    products = list.map(item => {
-        const mapped = {
-            id: item.idproducto || item.idProducto || item.id || null,
-            idProducto: item.idproducto || item.idProducto || item.id || null,
-            name: item.nombre || item.name || '',
-            tag: item.nombrecategoria || item.tag || '',
-            tagClass: safeLowerClass(item.nombrecategoria || item.tag || ''),
-            price: item.preciobase || item.precioBase || 0,
-            isOffer: !!item.enoferta,
+    
+// Dentro de tu función loadProducts, cambia el objeto 'mapped'
+products = list.map(item => {
+    const mapped = {
+        // Probamos todas las combinaciones posibles de nombres de columna
+        idProducto: item.idproducto || item.idProducto || item.id || null,
+        
+        // AQUÍ ESTÁ EL ARREGLO:
+        idCategoria: item.idcategoria || item.idCategoria || item.id_categoria || null, 
+        
+        name: item.nombre || item.name || '',
+        tag: item.nombrecategoria || item.tag || '',
+        tagClass: safeLowerClass(item.nombrecategoria || item.tag || ''),
+        price: item.preciobase || item.precioBase || 0,
+         isOffer: !!item.enoferta,
             descripcion: item.descripcion || '',
             esBorrado: !!item.esborrado,
             nombreCategoria: item.nombrecategoria || '',
             urlImagen: item.urlimagen || item.urlImagen || defaultImageFor(item.idproducto || item.idProducto || item.id)
-        };
-        return mapped;
-    });
+    };
+    return mapped;
+});
 
-    // Renderizar
     renderProducts(products);
-    // También actualizar la lista admin si está visible
     if (!DOM.editProductList.classList.contains('hidden')) {
         renderAdminProductList();
     }
@@ -154,7 +157,6 @@ async function apiCreateProduct(payload) {
     formData.append("descripcion", payload.descripcion);
     formData.append("enOferta", payload.enOferta);
     formData.append("idCategoria", payload.idCategoria);
-    fformData.append("stock", document.getElementById("new-product-stock").value);
 
 
     if (payload.imagenFile) {
@@ -211,7 +213,7 @@ function createProductCardHTML(product) {
     : defaultImageFor(product.idProducto);
 
     return `
-        <div class="product-card" data-product-id="${product.idProducto}" data-filter-id="${product.id}">
+        <div class="product-card" data-product-id="${product.idProducto}" data-filter-id="${product.idCategoria}">
             <div class="product-tag ${product.tagClass}">${product.tag}</div>
             <div class="product-image-placeholder" style="background-image: url('${imageUrl}'); background-size: cover; background-position: center;"></div>
             <div class="product-name">${product.name}</div>
@@ -241,17 +243,19 @@ function attachCardListeners() {
 function handleFilterClick(event) {
     event.preventDefault();
     const clickedLink = event.currentTarget;
-    const filterId = clickedLink.getAttribute('data-filter-id');
+    const filterId = clickedLink.getAttribute('data-filter-id'); // Viene del HTML
+    
     DOM.filterLinks.forEach(link => link.classList.remove('active'));
     clickedLink.classList.add('active');
 
-    let filteredProducts;
     if (filterId === '0') {
-        filteredProducts = products;
+        renderProducts(products);
     } else {
-        filteredProducts = products.filter(product => String(product.id) === String(filterId));
+        // Forzamos a ambos a ser números para evitar el error de "2" vs 2
+        const filtered = products.filter(p => Number(p.idCategoria) === Number(filterId));
+        console.log("Filtrando por ID:", filterId, "Encontrados:", filtered.length); // DEBUG
+        renderProducts(filtered);
     }
-    renderProducts(filteredProducts);
 }
 
 function openProductModal(product) {
@@ -264,12 +268,8 @@ function openProductModal(product) {
 
     document.getElementById("modal-image-placeholder").style.backgroundImage =
     `url('/uploads/${product.urlImagen}')`;
-
-
-    fillModalStock(product);
-
-    DOM.addToCartBtn.disabled = true;
-    DOM.addToCartBtn.textContent = 'Selecciona una variante';
+    DOM.addToCartBtn.disabled = false;
+    //DOM.addToCartBtn.textContent = 'Selecciona una variante';
     DOM.modal.style.display = 'block';
 }
 
@@ -327,10 +327,7 @@ function closeProductModal() {
 }
 
 function redirectToWhatsApp() {
-    if (!currentProduct || !selectedVariant) {
-        alert('Error: No hay producto o variante seleccionada.');
-        return;
-    }
+
     const messageLines = [
         '¡Hola! Estoy interesado/a en comprar el siguiente suplemento:',
         '',
@@ -418,6 +415,16 @@ function checkAuthOnLoad() {
     })();
 }
 
+
+
+
+
+
+
+
+
+
+
 function fillCategorySelects() {
     const select = DOM.newProductForm ? DOM.newProductForm.querySelector('select[name="categoria"]') : null;
     if (!select) return;
@@ -431,6 +438,16 @@ function fillCategorySelects() {
         select.appendChild(opt);
     });
 }
+
+
+
+
+
+
+
+
+
+
 
 function renderAdminProductList() {
     let listHTML = `
@@ -451,25 +468,26 @@ function renderAdminProductList() {
             <tbody>
     `;
 
-    products.forEach(product => {
-        // totalStock: si se quiere obtener, se puede consultar el inventario por producto; aquí dejamos "-" como placeholder
-        const totalStock = "-";
-        listHTML += `
-            <tr data-product-id="${product.idProducto}">
-                <td>${product.idProducto}</td>
-                <td>${product.name}</td>
-                <td>${formatPrice(product.price)}</td>
-                <td>${product.tag}</td>
-                <td>
-                    <button class="action-btn small edit-btn" data-id="${product.idProducto}">✏️ Editar</button>
-                    <button class="action-btn small secondary delete-btn" data-id="${product.idProducto}">🗑️ Eliminar</button>
-                    <span class="stock-info">(Total Stock: ${totalStock})</span>
-                </td>
-            </tr>
-        `;
-    });
-
-    listHTML += `</tbody></table><p class="admin-note">Nota: Use las acciones para editar/eliminar; crear un producto subirá datos al backend.</p>`;
+products.forEach(product => {
+    listHTML += `
+        <tr data-product-id="${product.idProducto}">
+            <td class="text-center"><strong>#${product.idProducto}</strong></td>
+            <td>${product.name}</td>
+            <td class="text-bold">${formatPrice(product.price)}</td>
+            <td><span class="badge">${product.tag}</span></td>
+            <td>
+                <div class="actions-container">
+                    <button class="btn-action edit" data-id="${product.idProducto}">
+                        <i></i> Editar
+                    </button>
+                    <button class="btn-action delete" data-id="${product.idProducto}">
+                        <i></i> Eliminar
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
+});
     DOM.editProductList.innerHTML = listHTML;
 
     const addProductFromListBtn = document.getElementById('add-product-from-list-btn');
@@ -558,7 +576,7 @@ async function handleNewProductSubmit(event) {
     const nombre = form.querySelector('[name="nombre"]').value.trim();
     const precioBase = form.querySelector('[name="precio"]').value;
     const descripcion = form.querySelector('[name="descripcion"]').value.trim();
-    const idCategoria = form.querySelector('[name="idArticulo"]').value;
+    const idCategoria = form.querySelector('[name="idCategoria"]').value;
     const fileInput = document.getElementById("new-product-image-file");
     const file = fileInput.files[0];
 
@@ -613,8 +631,7 @@ async function handleNewProductSubmit(event) {
 
 function initializeApp() {
     checkAuthOnLoad();
-    loadCategories(); 
-    loadVariants();   
+    loadCategories();  
     loadProducts();  
 
     if (DOM.masterLoginForm) DOM.masterLoginForm.addEventListener('submit', handleLogin);

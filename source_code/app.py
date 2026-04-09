@@ -19,7 +19,7 @@ app.config["SESSION_PERMANENT"] = False
 
 SQL_SERVER_CONFIG = {
     "driver": "{ODBC Driver 17 for SQL Server}",
-    "server": "localhost",
+    "server": "localhost\\SQLEXPRESS",
     "database": "BD_Okamifit",
     "timeout": 3,
 }
@@ -247,8 +247,6 @@ def api_crear_producto():
         descripcion = request.form.get("descripcion")
         enOferta = request.form.get("enOferta", "false") == "true"
         idCategoria = request.form.get("idCategoria")
-        stock = request.form.get("stock")
-
         imagen = request.files.get("imagenFile")
         if imagen:
 
@@ -278,9 +276,8 @@ def api_crear_producto():
         @descripcion=?,
         @enOferta=?,
         @idCategoria=?,
-        @urlImagen=?,
-        @stock=?
-""", (nombre, precioBase, descripcion, 1 if enOferta else 0, idCategoria, urlImagen, stock))
+        @urlImagen=?
+""", (nombre, precioBase, descripcion, 1 if enOferta else 0, idCategoria, urlImagen))
 
 
         conn.commit()
@@ -358,82 +355,6 @@ def get_categorias():
         return jsonify({"success": True, "data": categorias})
     except Exception as e:
         print("ERROR GET /api/categorias:", e)
-        return jsonify({"success": False, "message": str(e)}), 500
-    finally:
-        conn.close()
-
-@app.route("/api/variantes", methods=["GET"])
-def get_variantes():
-    conn, _ = get_connection()
-    if not conn:
-        return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
-    try:
-        cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_VARIANTES1 ?, ?", (None, 0))
-        variantes = rows_to_dicts(cur)
-        return jsonify({"success": True, "data": variantes})
-    except Exception as e:
-        print("ERROR GET /api/variantes:", e)
-        return jsonify({"success": False, "message": str(e)}), 500
-    finally:
-        conn.close()
-
-
-@app.route("/api/inventario/<int:idProducto>", methods=["GET"])
-def get_inventario_producto(idProducto):
-    conn, _ = get_connection()
-    if not conn:
-        return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
-    try:
-        cur = conn.cursor()
-        cur.execute("EXEC sp_Obtener_STOCK_VARIANTE1 ?, ?", (idProducto, None))
-        stock = rows_to_dicts(cur)
-        return jsonify({"success": True, "data": stock})
-    except Exception as e:
-        print("ERROR GET /api/inventario:", e)
-        return jsonify({"success": False, "message": str(e)}), 500
-    finally:
-        conn.close()
-
-
-@app.route("/api/inventario/<int:idProducto>", methods=["PUT"])
-@admin_required
-def update_inventario_producto(idProducto):
-    """
-    Espera un JSON con 'stock': [
-        {"idVariante": 1, "cantidadStock": 10},
-        {"idVariante": 2, "cantidadStock": 5},
-        ...
-    ]
-    """
-    payload = request.get_json()
-    stock_list = payload.get("stock", [])
-    if not isinstance(stock_list, list):
-        return jsonify({"success": False, "message": "Formato de stock inválido"}), 400
-
-    conn, _ = get_connection()
-    if not conn:
-        return jsonify({"success": False, "message": "No se pudo conectar a la BD"}), 500
-
-    try:
-        cur = conn.cursor()
-        for item in stock_list:
-            idVar = item.get("idVariante")
-            cantidad = item.get("cantidadStock", 0)
-            if idVar is None:
-                continue
-
-            cur.execute("SELECT cantidadStock FROM STOCK_VARIANTE WHERE idProducto = ? AND idVariante = ?", (idProducto, idVar))
-            existing = cur.fetchone()
-            if existing:
-                cur.execute("EXEC sp_Actualizar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
-            else:
-                cur.execute("EXEC sp_Agregar_STOCK_VARIANTE1 ?, ?, ?", (idProducto, idVar, cantidad))
-        conn.commit()
-        return jsonify({"success": True, "message": "Inventario actualizado"})
-    except Exception as e:
-        conn.rollback()
-        print("ERROR PUT /api/inventario:", e)
         return jsonify({"success": False, "message": str(e)}), 500
     finally:
         conn.close()

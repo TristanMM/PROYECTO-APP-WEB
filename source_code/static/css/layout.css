@@ -2,6 +2,81 @@
     padding: 30px 5%;
 }
 
+/* Contenedor de la tabla para que no pegue a los bordes */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden; /* Para que el borde redondeado funcione */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Encabezados */
+th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: 600;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Celdas */
+td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+/* Badge para la categoría */
+.badge {
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+/* Contenedor de botones en Flexbox */
+.actions-container {
+    display: flex;
+    gap: 8px; /* Espacio entre botones */
+}
+
+/* Botones con estilo moderno */
+.btn-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-action.edit {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-action.delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-action:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* Utilidades */
+.text-center { text-align: center; }
+.text-bold { font-weight: bold; color: #2d3748; }
+
 .products-grid-container h2 {
     margin-bottom: 20px;
     text-align: center;

@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Okami Fit - Suplementos</title>
 
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header-nav.css') }}">
@@ -15,6 +16,7 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/media-queries.css') }}">
 
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:,">
 </head>
 
 
@@ -31,7 +33,7 @@
             <span class="close-admin-btn">&times;</span>
 
             <section id="admin-panel" class="admin-panel-content">
-                <h2>Gestión de Catálogo 🛒</h2>
+                <h2>Gestión de Catálogo</h2>
                 <div class="admin-menu">
                     <button id="show-list-btn" class="action-btn primary">Regresar</button>
                 </div>
@@ -39,9 +41,9 @@
                 <div id="edit-product-list" class="admin-list-container hidden">
                     <h3>Lista de Productos</h3>
                     <p>Se está cargando el listado...</p>
-                    
-                    </div>
-                
+
+                </div>
+
                 <div id="add-product-form-container" class="admin-form-container hidden">
                     <h3>Agregar/Editar Producto</h3>
                     <form id="new-product-form" class="crud-form" enctype="multipart/form-data">
@@ -51,11 +53,17 @@
                         <label for="new-product-price">Precio Base (₡):</label>
                         <input type="number" id="new-product-price" name="precio" required min="0">
 
-                        <label for="new-product-tag">Tag (Ej: Proteína, Creatina, Oferta):</label>
-                        <input type="text" id="new-product-tag" name="tag" required>
-
-                        <label for="new-product-filter-id">ID de Artículo (Categoría 1-9):</label>
-                        <input type="number" id="new-product-filter-id" name="idArticulo" required min="1" max="9">
+                        <label for="new-product-filter-id">Categoría:</label>
+                        <select id="new-product-filter-id" name="idCategoria" required>
+                            <option value="1">Proteinas</option>
+                            <option value="2">Creatinas</option>
+                            <option value="3">Mass Gainers</option>
+                            <option value="4">Aminoacidos</option>
+                            <option value="5">Pre-Entrenos</option>
+                            <option value="6">Glutaminas</option>
+                            <option value="7">Shaker y bebidas</option>
+                            <option value="8">Colageno</option>
+                        </select>
 
                         <label for="new-product-description">Descripción:</label>
                         <textarea id="new-product-description" name="descripcion" required></textarea>
@@ -64,17 +72,13 @@
                         <label for="new-product-image-file">Subir Imagen:</label>
                         <input type="file" id="new-product-image-file" name="imagen" accept="image/*" required>
 
-                        <label for="new-product-stock">Stock Disponible:</label>
-                        <input type="number" id="new-product-stock" name="stock" required min="0">
-
-
                         <button type="submit" class="action-btn primary">Guardar Producto</button>
                     </form>
                 </div>
             </section>
         </div>
     </div>
-    
+
     <div id="login-form-container">
         <form id="master-login-form" class="login-form hidden">
             <h3>Acceso Maestro</h3>
@@ -89,10 +93,10 @@
     <nav class="filter-nav-container">
         <div class="filter-nav">
             <a href="#" class="filter-link active" data-filter-id="0">Todos</a>
-            <a href="#" class="filter-link" data-filter-id="1">Proteínas</a>
+            <a href="#" class="filter-link" data-filter-id="1">Proteinas</a>
             <a href="#" class="filter-link" data-filter-id="2">Creatinas</a>
             <a href="#" class="filter-link" data-filter-id="3">Mass Gainers</a>
-            <a href="#" class="filter-link" data-filter-id="4">Aminoácidos</a>
+            <a href="#" class="filter-link" data-filter-id="4">Aminoacidos</a>
             <a href="#" class="filter-link" data-filter-id="5">Pre-Entrenos</a>
             <a href="#" class="filter-link" data-filter-id="6">Glutaminas</a>
             <a href="#" class="filter-link" data-filter-id="7">Shaker y bebidas</a>
@@ -109,7 +113,7 @@
 
     <hr>
 
-<footer>
+    <footer>
         <div class="footer-container">
             <div class="footer-col brand-contact">
                 <h2>CONTACTO</h2>
@@ -136,18 +140,22 @@
                     <br>
                     <br>
                     <h2>Ubicación para retiros:</h2><br>
-                    <iframe src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1268.87657230253!2d-83.05039222669966!3d9.981772540099822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwNTgnNTQuNCJOIDgzwrAwMycwMS42Ilc!5e1!3m2!1ses-419!2scr!4v1775686653561!5m2!1ses-419!2scr" width="300" height="225" style="border-radius:10px;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+                    <iframe
+                        src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1268.87657230253!2d-83.05039222669966!3d9.981772540099822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwNTgnNTQuNCJOIDgzwrAwMycwMS42Ilc!5e1!3m2!1ses-419!2scr!4v1775686653561!5m2!1ses-419!2scr"
+                        width="300" height="225" style="border-radius:10px;" allowfullscreen="" loading="lazy"
+                        referrerpolicy="no-referrer-when-downgrade"></iframe>
                 </ul>
             </div>
         </div>
 
-    </footer>
+            
+    </footer>
 
     <div class="floating-actions">
         <button class="action-btn">Perfil Maestro</button>
         <div id="admin-controls-container" class="admin-float-controls hidden">
-            <button id="edit-catalog-btn" class="action-btn secondary">✏️ Editar Catálogo</button>
-            <button id="logout-btn" class="action-btn accent">🚪 Cerrar Sesión</button>
+            <button id="edit-catalog-btn" class="action-btn secondary">Editar Catálogo</button>
+            <button id="logout-btn" class="action-btn accent">Cerrar Sesión</button>
         </div>
     </div>
     <div id="productModal" class="modal">
@@ -158,8 +166,7 @@
                 <div class="modal-info-text">
                     <h3 id="modal-product-name"></h3>
                     <p class="modal-price-display">Precio: <span id="modal-price"></span></p>
-                    <p class="modal-stock-label">Variante (Stock):</p>
-                    <div id="stock-container" class="stock-container"></div>
+
                     <div class="product-description">
                         <h4>Detalles del Producto:</h4>
                         <p id="modal-description">Descripción detallada del producto.</p>
@@ -174,48 +181,48 @@
     </div>
 
 
-<div id="infoModal" class="modal">
-  <div class="modal-content">
-    <span class="close" onclick="closeModal()">&times;</span>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
 
-    <h2 id="modalTitle"></h2>
-    <p id="modalText"></p>
+            <h2 id="modalTitle"></h2>
+            <p id="modalText"></p>
 
-  </div>
-</div>
+        </div>
+    </div>
 
 
-<script src="{{ url_for('static', filename='js/script2.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/script2.js') }}"></script>
 
-<script>
-function openModal(section) {
+    <script>
+        function openModal(section) {
 
-    const title = document.getElementById("modalTitle");
-    const text = document.getElementById("modalText");
+            const title = document.getElementById("modalTitle");
+            const text = document.getElementById("modalText");
 
-    if (section === "quienes") {
-        title.textContent = "¿Quiénes somos?";
-text.innerHTML =
-    "<br>En Okami Fit ofrecemos los mejores precios del país y una amplia variedad de suplementos de calidad garantizada. Nuestro compromiso es ayudarte a alcanzar tus metas fitness mediante productos confiables que impulsan tu rendimiento y bienestar.<br><br>" +
-    "En Okami Fit trabajamos con pasión, compromiso y transparencia, siempre priorizando tu salud y confianza. Queremos motivarte, impulsarte y demostrarte que con disciplina, constancia y buenos productos tu mejor versión siempre es posible.";
+            if (section === "quienes") {
+                title.textContent = "¿Quiénes somos?";
+                text.innerHTML =
+                    "<br>En Okami Fit ofrecemos los mejores precios del país y una amplia variedad de suplementos de calidad garantizada. Nuestro compromiso es ayudarte a alcanzar tus metas fitness mediante productos confiables que impulsan tu rendimiento y bienestar.<br><br>" +
+                    "En Okami Fit trabajamos con pasión, compromiso y transparencia, siempre priorizando tu salud y confianza. Queremos motivarte, impulsarte y demostrarte que con disciplina, constancia y buenos productos tu mejor versión siempre es posible.";
 
-    }
+            }
 
-    document.getElementById("infoModal").style.display = "block";
-}
+            document.getElementById("infoModal").style.display = "block";
+        }
 
-function closeModal() {
-    document.getElementById("infoModal").style.display = "none";
-}
+        function closeModal() {
+            document.getElementById("infoModal").style.display = "none";
+        }
 
-// Cerrar haciendo clic fuera del modal
-window.onclick = function (event) {
-    const modal = document.getElementById("infoModal");
-    if (event.target === modal) {
-        closeModal();
-    }
-};
-</script>
+        // Cerrar haciendo clic fuera del modal
+        window.onclick = function (event) {
+            const modal = document.getElementById("infoModal");
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+    </script>
 
 </body>
 
