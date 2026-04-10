@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Okami Fit - Suplementos</title>
+    <title>Okami Fit Costa Rica</title>
 
 
     <link rel="stylesheet" href="{{ url_for('static', filename='css/base.css') }}">
@@ -24,7 +24,7 @@
 
     <header class="main-header">
         <div class="header-banner">
-            <img src="{{ url_for('static', filename='img/ban.jpg') }}">
+            <img src="{{ url_for('static', filename='img/ban.png') }}">
         </div>
     </header>
 
@@ -81,8 +81,8 @@
 
     <div id="login-form-container">
         <form id="master-login-form" class="login-form hidden">
-            <h3>Acceso Maestro</h3>
-            <input type="text" id="login-username" placeholder="Usuario Maestro" required>
+            <h3>Acceso Administrador</h3>
+            <input type="text" id="login-username" placeholder="Usuario" required>
             <input type="password" id="login-password" placeholder="Contraseña" required>
             <button type="submit">Iniciar Sesión</button>
             <button class="close-login-btn">❌</button>
@@ -106,53 +106,51 @@
     </nav>
 
     <main class="products-grid-container">
-        <h2>Nuestros Productos Destacados</h2>
+        <h2>Nuestros Productos</h2>
         <div class="products-grid">
         </div>
     </main>
 
     <hr>
 
-    <footer>
+    <footer class="main-footer">
         <div class="footer-container">
-            <div class="footer-col brand-contact">
-                <h2>CONTACTO</h2>
-                <h3>somosokamifitness@gmail.com</h3>
-                <h3>WhatsApp: ‪+506 8938-1855‬</h3>
-                <br><br>
-                <br>
-                <ul class="social-links">
-                    <li><a href="https://www.facebook.com/share/1Fv6RHfnec/?mibextid=wwXIfr"
-                            aria-label="Facebook">Facebook<i class="fab fa-facebook-f"></i></a></li>
-                    <li><a href="https://www.instagram.com/okamifit_cr?igsh=MTZqbjd2ajRncmxhdA%3D%3D&utm_source=qr"
-                            aria-label="Instagram">Instagram<i class="fab fa-instagram"></i></a></li>
+            <div class="footer-col brand-info">
+                <h2>&emsp;&emsp;&emsp;CONTACTO</h2>
+                <p>&emsp;WhatsApp: +506 8938-1855</p>
+                <p>somosokamifitness@gmail.com</p>
 
+                <div class="social-links">
+                    <a href="https://www.facebook.com/share/1Fv6RHfnec/?mibextid=wwXIfr">Facebook</a>
+                    <a
+                        href="https://www.instagram.com/okamifit_cr?igsh=MTZqbjd2ajRncmxhdA%3D%3D&utm_source=qr">Instagram</a>
+                </div>
+
+            </div>
+
+            <div class="footer-col links-info">
+                <h2>OKAMI FIT</h2>
+                <ul class="link-list">
+                    <li><a href="#" onclick="openModal('quienes')">Quiénes somos</a></li>
+                    <li><a href="#" onclick="openModal('terminos')">Términos y condiciones</a></li>
+                    <li><a href="#" onclick="openModal('privacidad')">Declaración de privacidad</a></li>
                 </ul>
             </div>
 
-            <div class="footer-col okami-links">
-                <h2 class="hidden-title">Okami</h2>
-                <ul class="link-list">
-                    <h2>OKAMI FIT</h2>
-                    <br>
-                    <li><a href="#" onclick="openModal('quienes')">Quiénes somos</a></li>
-                    <br>
-                    <br>
-                    <br>
-                    <h2>Ubicación para retiros:</h2><br>
+            <div class="footer-col map-info">
+                <h2>UBICACIÓN PARA RETIROS</h2>
+                <div class="map-wrapper">
                     <iframe
                         src="https://www.google.com/maps/embed?pb=!1m17!1m12!1m3!1d1268.87657230253!2d-83.05039222669966!3d9.981772540099822!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m2!1m1!2zOcKwNTgnNTQuNCJOIDgzwrAwMycwMS42Ilc!5e1!3m2!1ses-419!2scr!4v1775686653561!5m2!1ses-419!2scr"
-                        width="300" height="225" style="border-radius:10px;" allowfullscreen="" loading="lazy"
-                        referrerpolicy="no-referrer-when-downgrade"></iframe>
-                </ul>
+                        width="100%" height="150" style="border:0; border-radius:8px;"></iframe>
+                </div>
             </div>
-        </div>
 
-            
+        </div>
     </footer>
 
     <div class="floating-actions">
-        <button class="action-btn">Perfil Maestro</button>
+        <button class="action-btn">Administrador</button>
         <div id="admin-controls-container" class="admin-float-controls hidden">
             <button id="edit-catalog-btn" class="action-btn secondary">Editar Catálogo</button>
             <button id="logout-btn" class="action-btn accent">Cerrar Sesión</button>
@@ -175,7 +173,7 @@
             </div>
             <div class="modal-actions">
                 <button class="action-btn secondary" id="close-modal-bottom">Cerrar</button>
-                <button class="action-btn primary" id="add-to-cart-btn">Comprar</button>
+                <button class="action-btn primary" id="add-to-cart-btn">Hacer pedido</button>
             </div>
         </div>
     </div>
@@ -196,7 +194,6 @@
 
     <script>
         function openModal(section) {
-
             const title = document.getElementById("modalTitle");
             const text = document.getElementById("modalText");
 
@@ -206,6 +203,38 @@
                     "<br>En Okami Fit ofrecemos los mejores precios del país y una amplia variedad de suplementos de calidad garantizada. Nuestro compromiso es ayudarte a alcanzar tus metas fitness mediante productos confiables que impulsan tu rendimiento y bienestar.<br><br>" +
                     "En Okami Fit trabajamos con pasión, compromiso y transparencia, siempre priorizando tu salud y confianza. Queremos motivarte, impulsarte y demostrarte que con disciplina, constancia y buenos productos tu mejor versión siempre es posible.";
 
+            }
+            else if (section === "terminos") {
+                title.textContent = "Términos y Condiciones";
+                text.innerHTML = `
+            <div style="text-align: left; font-size: 0.9rem;">
+                <br>
+                <p>Bienvenida a Okami Fit. Al acceder a nuestro sitio web, usted acepta cumplir con los siguientes términos:</p>
+                <br>
+                <p><b>Uso de Productos:</b> Los suplementos vendidos en este sitio son para uso personal. Se recomienda consultar con un profesional de la salud antes de iniciar cualquier régimen de suplementación.</p>
+                <br>
+                <p><b>Precios y Pagos::</b> Todos los precios están expresados en Colones (₡). Nos reservamos el derecho de modificar precios sin previo aviso. Los pedidos se procesan una vez confirmado el pago vía SINPE Móvil o transferencia.</p>
+                 <br>
+                <p><b>Entregas y Retiros:</b> Los retiros personales se realizan en nuestra ubicación en Limón, previa coordinación. Los envíos a otras zonas están sujetos a las tarifas de mensajería vigentes.</p>
+                 <br>
+                <p><b>Cancelaciones:</b> No se aceptan devoluciones de productos cuyo sello de seguridad haya sido violado por razones de salud pública.</p>
+            </div>`;
+            }
+            else if (section === "privacidad") {
+                title.textContent = "Declaración de Privacidad";
+                text.innerHTML = `
+            <div style="text-align: left; font-size: 0.9rem;">
+                <br>
+                <p>En Okami Fit, valoramos su privacidad. Esta declaración explica cómo manejamos su información:</p>
+                <br>
+                <p><b>Recopilación de Datos:</b> Solo solicitamos la información necesaria para procesar su pedido (Nombre, Teléfono y Ubicación) a través de nuestros formularios y contacto de WhatsApp.</p>
+                <br>
+                <p><b>Uso de la Información:</b> Sus datos se utilizan exclusivamente para la entrega de productos y atención al cliente. No compartimos ni vendemos su información a terceros.</p>
+                <br>
+                <p><b>Seguridad:</b> Implementamos medidas técnicas para proteger la integridad de sus datos durante la navegación en nuestra plataforma.</p>
+                <br>
+                <p><b>Derechos:</b> Usted puede solicitar la eliminación de su contacto de nuestra base de datos en cualquier momento enviándonos un mensaje directo.</p>
+            </div>`;
             }
 
             document.getElementById("infoModal").style.display = "block";

@@ -40,7 +40,12 @@ body {
     width: 100%;
     height: auto;
     display: block;
-    object-fit: cover;
+    object-fit: contain;
+    
+    /* --- MEJORA DE CALIDAD --- */
+    image-rendering: -webkit-optimize-contrast; /* Para Chrome, Edge y Safari */
+    image-rendering: crisp-edges;               /* Para Firefox */
+    transform: translateZ(0);                   /* Forza renderizado por hardware */
 }
 
 .filter-nav-container {

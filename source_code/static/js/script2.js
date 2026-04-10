@@ -332,12 +332,12 @@ function redirectToWhatsApp() {
         '¡Hola! Estoy interesado/a en comprar el siguiente suplemento:',
         '',
         `Producto: ${currentProduct.name}`,
-        `Variante: ${selectedVariant}`,
-        `Precio: ${formatPrice(currentProduct.price)}`,
-        `Código del Producto: ${currentProduct.idProducto}`,
         '',
-        '¿Me confirmas la disponibilidad para hacer el pedido?'
+        `Precio: ${formatPrice(currentProduct.price)}`,
+        '',
+        '¿Me confirmas disponibilidad del producto para hacer el pedido?'
     ];
+
     const encodedMessage = encodeURIComponent(messageLines.join('\n'));
     const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
@@ -494,7 +494,7 @@ products.forEach(product => {
     if (addProductFromListBtn) addProductFromListBtn.addEventListener('click', () => showAdminSection('add'));
 
     // editar
-    DOM.editProductList.querySelectorAll('.edit-btn').forEach(btn => {
+    DOM.editProductList.querySelectorAll('.btn-action.edit').forEach(btn => {
         btn.addEventListener('click', async (event) => {
             const id = event.currentTarget.getAttribute('data-id');
             await openEditProductForm(id);
@@ -502,7 +502,7 @@ products.forEach(product => {
     });
 
     // eliminar
-    DOM.editProductList.querySelectorAll('.delete-btn').forEach(btn => {
+    DOM.editProductList.querySelectorAll('.btn-action.delete').forEach(btn => {
         btn.addEventListener('click', async (event) => {
             const id = event.currentTarget.getAttribute('data-id');
             if (!confirm(`¿Estás seguro de eliminar el producto ${id}?`)) return;
