@@ -18,7 +18,8 @@ app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_PERMANENT"] = False
 
 SQL_SERVER_CONFIG = {
-    "driver": "{ODBC Driver 17 for SQL Server}",
+    # Cambiamos a Driver 18 que es el estándar actual en Azure Linux
+    "driver": "{ODBC Driver 18 for SQL Server}", 
     "server": os.environ.get('DB_SERVER', 'okamifit-server.database.windows.net'),
     "database": os.environ.get('DB_NAME', 'okamifit_db'),
     "user": os.environ.get('DB_USER'),
@@ -27,22 +28,29 @@ SQL_SERVER_CONFIG = {
 
 def get_connection():
     try:
-        # En Azure NO se usa Trusted_Connection=yes, se usa UID y PWD
+        # Usamos variables locales para que sea más limpio
+        server = SQL_SERVER_CONFIG['server']
+        database = SQL_SERVER_CONFIG['database']
+        username = SQL_SERVER_CONFIG['user']
+        password = SQL_SERVER_CONFIG['pass']
+        driver = SQL_SERVER_CONFIG['driver']
+
         conn_str = (
-            f"DRIVER={SQL_SERVER_CONFIG['driver']};"
-            f"SERVER={SQL_SERVER_CONFIG['server']};"
+            f"DRIVER={driver};"
+            f"SERVER={server};"
             f"PORT=1433;"
-            f"DATABASE={SQL_SERVER_CONFIG['database']};"
-            f"UID={SQL_SERVER_CONFIG['user']};"
-            f"PWD={SQL_SERVER_CONFIG['pass']};"
+            f"DATABASE={database};"
+            f"UID={username};"
+            f"PWD={password};"
             "Encrypt=yes;"
-            "TrustServerCertificate=no;"
+            "TrustServerCertificate=no;" # Cambiado a no para Azure SQL
             "Connection Timeout=30;"
         )
         conn = pyodbc.connect(conn_str)
         return conn, "sqlserver"
     except pyodbc.Error as ex:
-        print(f"❌ FALLO CRÍTICO: No se pudo conectar a Azure SQL: {ex}")
+        # Esto saldrá en el "Log Stream" que buscábamos
+        print(f"❌ ERROR DE CONEXIÓN: {ex}") 
         return None, None
 
 def row_to_dict_lower(row, cursor):

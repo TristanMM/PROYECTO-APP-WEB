@@ -1,4 +1,8 @@
-const API_BASE = "http://127.0.0.1:5000";
+// Si detecta que estás en localhost, usa el puerto 5000. 
+// Si estás en Azure, usa una ruta vacía (relativa).
+const API_BASE = window.location.hostname === '127.0.0.1' || window.location.hostname === 'localhost' 
+    ? "http://127.0.0.1:5000" 
+    : "";
 const WHATSAPP_NUMBER = '50689381855';
 const ALL_VARIANTS = ['Disponibles'];
 const AUTH_TOKEN_KEY = 'masterToken';
