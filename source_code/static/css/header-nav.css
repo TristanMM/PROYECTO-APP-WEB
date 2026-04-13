@@ -51,14 +51,23 @@ body {
 .filter-nav-container {
     background-color: var(--color-primary);
     padding: 10px 0;
+    width: 100%;
     overflow-x: auto;
     white-space: nowrap;
+    scrollbar-width: none; /* Oculta scroll en Firefox */
+}
+
+/* Oculta la barra de scroll en Chrome y Safari para que se vea más limpio */
+.filter-nav-container::-webkit-scrollbar {
+    display: none;
 }
 
 .filter-nav {
     display: flex;
-    justify-content: center;
+    /* justify-content: center;  <-- ELIMINA O COMENTA ESTA LÍNEA */
     padding: 0 5%;
+    flex-wrap: nowrap; /* Asegura que no se bajen a otra línea */
+    justify-content: flex-start;
 }
 
 .filter-nav a {
@@ -69,6 +78,7 @@ body {
     border-radius: 4px;
     font-size: 0.9em;
     transition: background-color 0.3s;
+    flex: 0 0 auto; /* CRUCIAL: evita que los botones se encojan */
 }
 
 .filter-nav a.active,

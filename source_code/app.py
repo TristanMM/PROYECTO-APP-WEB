@@ -19,24 +19,30 @@ app.config["SESSION_PERMANENT"] = False
 
 SQL_SERVER_CONFIG = {
     "driver": "{ODBC Driver 17 for SQL Server}",
-    "server": "localhost\\SQLEXPRESS",
-    "database": "BD_Okamifit",
-    "timeout": 3,
+    "server": os.environ.get('DB_SERVER', 'okamifit-server.database.windows.net'),
+    "database": os.environ.get('DB_NAME', 'okamifit_db'),
+    "user": os.environ.get('DB_USER'),
+    "pass": os.environ.get('DB_PASS'),
 }
 
 def get_connection():
     try:
+        # En Azure NO se usa Trusted_Connection=yes, se usa UID y PWD
         conn_str = (
             f"DRIVER={SQL_SERVER_CONFIG['driver']};"
             f"SERVER={SQL_SERVER_CONFIG['server']};"
+            f"PORT=1433;"
             f"DATABASE={SQL_SERVER_CONFIG['database']};"
-            f"Trusted_Connection=yes;"
-            f"ConnectionTimeout={SQL_SERVER_CONFIG['timeout']};"
+            f"UID={SQL_SERVER_CONFIG['user']};"
+            f"PWD={SQL_SERVER_CONFIG['pass']};"
+            "Encrypt=yes;"
+            "TrustServerCertificate=no;"
+            "Connection Timeout=30;"
         )
         conn = pyodbc.connect(conn_str)
         return conn, "sqlserver"
     except pyodbc.Error as ex:
-        print(f"❌ FALLO CRÍTICO: SQL Server está caído: {ex}")
+        print(f"❌ FALLO CRÍTICO: No se pudo conectar a Azure SQL: {ex}")
         return None, None
 
 def row_to_dict_lower(row, cursor):
@@ -388,4 +394,6 @@ def serve_uploads(filename):
     return send_from_directory('uploads', filename)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Azure requiere que la app escuche en 0.0.0.0
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
