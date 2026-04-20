@@ -1,0 +1,34 @@
+@media (max-width: 768px) {
+    .main-nav {
+        display: none;
+    }
+
+    .products-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .products-grid {
+        grid-template-columns: repeat(1, 1fr);
+    }
+}
+
+/* Forzamos el centrado de la columna de CONTACTO */
+    .footer-col.brand-info {
+        display: flex;
+        flex-direction: column;
+        align-items: center !important; /* Centra los elementos hijos (título, p, social-links) */
+        text-align: center !important;
+    }
+
+    /* --- ESTO ARREGLA EL PC --- */
+@media (min-width: 1024px) {
+    .filter-nav {
+        justify-content: center; /* Centra los filtros en pantallas grandes */
+    }
+    
+    .filter-nav-container {
+        overflow-x: hidden; /* Quita el scroll innecesario en PC */
+    }
+}

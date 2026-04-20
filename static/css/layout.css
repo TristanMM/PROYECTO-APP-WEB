@@ -1,0 +1,204 @@
+.products-grid-container {
+    padding: 30px 5%;
+}
+
+/* Contenedor de la tabla para que no pegue a los bordes */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden; /* Para que el borde redondeado funcione */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+/* Encabezados */
+th {
+    background-color: #f8f9fa;
+    color: #333;
+    font-weight: 600;
+    padding: 15px;
+    text-align: left;
+    border-bottom: 2px solid #dee2e6;
+}
+
+/* Celdas */
+td {
+    padding: 12px 15px;
+    vertical-align: middle;
+    border-bottom: 1px solid #eee;
+    color: #444;
+}
+
+/* Badge para la categoría */
+.badge {
+    background: #e9ecef;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.85em;
+    text-transform: uppercase;
+}
+
+/* Contenedor de botones en Flexbox */
+.actions-container {
+    display: flex;
+    gap: 8px; /* Espacio entre botones */
+}
+
+/* Botones con estilo moderno */
+.btn-action {
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.btn-action.edit {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.btn-action.delete {
+    background-color: #ef4444;
+    color: white;
+}
+
+.btn-action:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+}
+
+/* Utilidades */
+.text-center { text-align: center; }
+.text-bold { font-weight: bold; color: #2d3748; }
+
+.products-grid-container h2 {
+    margin-bottom: 20px;
+    text-align: center;
+    color: var(--color-primary);
+}
+
+.products-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+/* Contenedor Raíz */
+.main-footer {
+    background-color: #000 !important; /* Negro total */
+    color: #fff !important;
+    padding: 60px 0 40px 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+.footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 5%;
+    gap: 50px; /* Espacio real entre columnas */
+}
+
+.footer-col {
+    flex: 1;
+}
+
+.footer-col h2 {
+    color: #fff;
+    font-size: 14px;
+    letter-spacing: 2px;
+    margin-bottom: 25px;
+    font-weight: bold;
+}
+
+.footer-col p, .footer-col li, .footer-col a {
+    color: #aaa; /* Gris suave para el texto secundario */
+    font-size: 13px;
+    text-decoration: none;
+    list-style: none;
+    margin-bottom: 10px;
+}
+
+/* Redes Sociales */
+.social-links {
+    margin: 20px 0;
+    display: flex;
+    gap: 15px;
+}
+
+.social-links a {
+    color: #fff;
+    background: #1a1a1a;
+    padding: 8px 12px;
+    border-radius: 5px;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    background: #333;
+}
+
+/* Copyright y Línea */
+.footer-divider {
+    border: 0;
+    margin: 20px 0;
+    width: 80%;
+}
+
+.footer-copyright p {
+    font-size: 11px;
+    color: #666;
+}
+
+/* Columna de Enlaces */
+.link-list {
+    padding: 0;
+}
+
+.link-list li a:hover {
+    color: #fff;
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+        gap: 30px;
+    }
+}
+
+/* Centrar las redes sociales en su columna */
+.social-links {
+    display: flex;
+    gap: 15px;
+    margin: 20px 0;
+    justify-content: flex-start; /* Las mantiene alineadas con el texto de arriba */
+}
+
+/* Si quieres que los botones de FB e IG estén centrados respecto a 'CONTACTO' */
+.footer-col.brand-info {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Alinea todo a la izquierda de la columna */
+}
+
+/* ARREGLO PARA EL COPYRIGHT: 
+   Asegúrate de que esté dentro de la columna de Contacto en el HTML */
+.footer-copyright {
+    margin-top: 30px;
+    width: 100%; /* Ocupa el ancho de la columna */
+    text-align: left; /* Lo mantiene alineado con los datos de contacto */
+}
+
+.footer-divider {
+    border: 0;
+    margin: 15px 0;
+    width: 100%; /* Que la línea cruce toda la columna */
+}
