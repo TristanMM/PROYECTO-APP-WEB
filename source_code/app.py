@@ -17,31 +17,32 @@ app.config["SESSION_COOKIE_SECURE"] = True  # En producción cámbialo a True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_PERMANENT"] = False
 
+# Modifica tu diccionario de configuración
 SQL_SERVER_CONFIG = {
-    # Cambiamos a Driver 18 que es el estándar actual en Azure Linux
     "driver": "{ODBC Driver 18 for SQL Server}", 
-    "server": "localhost\\SQLEXPRESS",
-    "database": os.environ.get('DB_NAME', 'BD_Okamifit'),
+    "server": os.environ.get('DB_SERVER'), # Ejemplo: 'tuservidor.database.windows.net'
+    "database": os.environ.get('DB_NAME'),
     "user": os.environ.get('DB_USER'),
     "pass": os.environ.get('DB_PASS'),
 }
 
 def get_connection():
     try:
-        # Usamos variables locales para que sea más limpio
-        server = SQL_SERVER_CONFIG['server']
-        database = SQL_SERVER_CONFIG['database']
-        username = SQL_SERVER_CONFIG['user']
-        password = SQL_SERVER_CONFIG['pass']
-        driver = SQL_SERVER_CONFIG['driver']
-
+        # Cadena de conexión para Azure (requiere Authentication y Encrypt)
         conn_str = (
-    f"DRIVER={driver};"
-    f"SERVER={server};"
-    f"DATABASE={database};"
-    "Trusted_Connection=yes;"
-    "Encrypt=no;"
-)
+            f"DRIVER={SQL_SERVER_CONFIG['driver']};"
+            f"SERVER={SQL_SERVER_CONFIG['server']};"
+            f"DATABASE={SQL_SERVER_CONFIG['database']};"
+            f"UID={SQL_SERVER_CONFIG['user']};"
+            f"PWD={SQL_SERVER_CONFIG['pass']};"
+            "Encrypt=yes;" # Obligatorio en Azure
+            "TrustServerCertificate=no;"
+            "Connection Timeout=30;"
+        )
+        return pyodbc.connect(conn_str)
+    except Exception as e:
+        print(f"Error de conexión: {e}")
+        return None
         conn = pyodbc.connect(conn_str)
         return conn, "sqlserver"
     except pyodbc.Error as ex:
