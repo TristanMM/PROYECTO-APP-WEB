@@ -20,8 +20,8 @@ app.config["SESSION_PERMANENT"] = False
 SQL_SERVER_CONFIG = {
     # Cambiamos a Driver 18 que es el estándar actual en Azure Linux
     "driver": "{ODBC Driver 18 for SQL Server}", 
-    "server": os.environ.get('DB_SERVER', 'okamifit-server.database.windows.net'),
-    "database": os.environ.get('DB_NAME', 'okamifit_db'),
+    "server": "localhost\\SQLEXPRESS",
+    "database": os.environ.get('DB_NAME', 'BD_Okamifit'),
     "user": os.environ.get('DB_USER'),
     "pass": os.environ.get('DB_PASS'),
 }
@@ -36,16 +36,12 @@ def get_connection():
         driver = SQL_SERVER_CONFIG['driver']
 
         conn_str = (
-            f"DRIVER={driver};"
-            f"SERVER={server};"
-            f"PORT=1433;"
-            f"DATABASE={database};"
-            f"UID={username};"
-            f"PWD={password};"
-            "Encrypt=yes;"
-            "TrustServerCertificate=no;" # Cambiado a no para Azure SQL
-            "Connection Timeout=30;"
-        )
+    f"DRIVER={driver};"
+    f"SERVER={server};"
+    f"DATABASE={database};"
+    "Trusted_Connection=yes;"
+    "Encrypt=no;"
+)
         conn = pyodbc.connect(conn_str)
         return conn, "sqlserver"
     except pyodbc.Error as ex:
