@@ -4,6 +4,14 @@ import uuid
 import os
 from functools import wraps
 
+drivers = pyodbc.drivers()
+
+driver = (
+    "{ODBC Driver 18 for SQL Server}"
+    if "ODBC Driver 18 for SQL Server" in drivers
+    else "{ODBC Driver 17 for SQL Server}"
+)
+
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 
@@ -19,7 +27,7 @@ app.config["SESSION_PERMANENT"] = False
 
 # Modifica tu diccionario de configuración
 SQL_SERVER_CONFIG = {
-    "driver": "{ODBC Driver 18 for SQL Server}", 
+    "driver": driver, 
     "server": os.environ.get('DB_SERVER'), # Ejemplo: 'tuservidor.database.windows.net'
     "database": os.environ.get('DB_NAME'),
     "user": os.environ.get('DB_USER'),
@@ -30,15 +38,12 @@ def get_connection():
     try:
         # Cadena de conexión para Azure (requiere Authentication y Encrypt)
         conn_str = (
-            f"DRIVER={SQL_SERVER_CONFIG['driver']};"
-            f"SERVER={SQL_SERVER_CONFIG['server']};"
-            f"DATABASE={SQL_SERVER_CONFIG['database']};"
-            f"UID={SQL_SERVER_CONFIG['user']};"
-            f"PWD={SQL_SERVER_CONFIG['pass']};"
-            "Encrypt=yes;" # Obligatorio en Azure
-            "TrustServerCertificate=no;"
-            "Connection Timeout=30;"
-        )
+    f"DRIVER={SQL_SERVER_CONFIG['driver']};"
+    "SERVER=localhost\\SQLEXPRESS;"
+    "DATABASE=BD_Okamifit;"
+    "Trusted_Connection=yes;"
+    "TrustServerCertificate=yes;"
+)
         return pyodbc.connect(conn_str)
     except Exception as e:
         print(f"Error de conexión: {e}")
