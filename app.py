@@ -1,13 +1,16 @@
+from dotenv import load_dotenv
+load_dotenv()
 from flask import Flask, flash, render_template, request, session, jsonify, redirect, url_for, send_from_directory
 import pyodbc
 import uuid
 import os
 from functools import wraps
-from pagos import crear_orden_pago
+from onvopay import crear_checkout_session
 import uuid
+import hmac
+import hashlib
 
-from dotenv import load_dotenv
-load_dotenv()
+ONVO_WEBHOOK_SECRET = os.environ.get('ONVO_WEBHOOK_SECRET', '')
 
 drivers = pyodbc.drivers()
 
@@ -495,37 +498,62 @@ def checkout():
     if not cart:
         return redirect(url_for('ver_carrito'))
 
-    # Calculamos el total
-    total = sum(item['precio'] * item['cantidad'] for item in cart.values())
+    total         = sum(item['precio'] * item['cantidad'] for item in cart.values())
+    orden_id      = str(uuid.uuid4())[:12].upper()
+    email_cliente = request.form.get('email', '')
+    nombres       = ', '.join(item['nombre'] for item in cart.values())
+    descripcion   = f"Okami Fit: {nombres[:100]}"
 
-    # Generamos un ID único para esta orden
-    orden_id = str(uuid.uuid4())[:12].upper()
+    # 1. Guardar orden pendiente en BD
+    conn   = get_connection()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("""
+            INSERT INTO ordenes (orden_id, email_cliente, total, estado)
+            VALUES (?, ?, ?, 'pendiente')
+        """, (orden_id, email_cliente, total))
 
-    # Descripción del pedido
-    nombres = ', '.join(item['nombre'] for item in cart.values())
-    descripcion = f"Okami Fit: {nombres[:100]}"
+        for item in cart.values():
+            cursor.execute("""
+                INSERT INTO orden_detalle
+                    (orden_id, producto_id, nombre, precio, cantidad, subtotal)
+                VALUES (?, ?, ?, ?, ?, ?)
+            """, (
+                orden_id,
+                item['id'],
+                item['nombre'],
+                item['precio'],
+                item['cantidad'],
+                item['precio'] * item['cantidad']
+            ))
+        conn.commit()
+    except Exception as e:
+        conn.rollback()
+        flash(f'Error creando la orden: {e}', 'error')
+        return redirect(url_for('ver_carrito'))
+    finally:
+        cursor.close()
+        conn.close()
 
-    # Email del cliente (lo pediremos en el formulario del carrito)
-    email_cliente = request.form.get('email', 'cliente@correo.com')
-
-    # Guardamos la orden en sesión para recuperarla después
-    session['orden_pendiente'] = {
-        'orden_id':  orden_id,
-        'total':     total,
-        'productos': list(cart.values())
-    }
-    session.modified = True
-
-    # Creamos la orden en Payválida
-    resultado = crear_orden_pago(
-        orden_id=orden_id,
-        monto_colones=int(total),
-        descripcion=descripcion,
-        email_cliente=email_cliente
-    )
+    # 2. Crear sesión de checkout en OnvoPay
+    BASE_URL  = request.host_url.rstrip('/')
+    resultado = crear_checkout_session(
+    items_carrito = list(cart.values()),
+    orden_id      = orden_id,
+    email_cliente = email_cliente,
+    success_url   = f'{BASE_URL}/pago/exitoso?orden={orden_id}',
+    cancel_url    = f'{BASE_URL}/pago/cancelado'
+)
 
     if resultado['ok']:
-        return redirect(resultado['url_pago'])  # redirige a Payválida
+        # Guardamos el ID de sesión OnvoPay para verificarlo después
+        session['orden_pendiente'] = {
+            'orden_id':   orden_id,
+            'total':      total,
+            'session_id': resultado['id']
+        }
+        session.modified = True
+        return redirect(resultado['url'])  # → página de pago de OnvoPay
     else:
         flash(f"Error al procesar el pago: {resultado['error']}", 'error')
         return redirect(url_for('ver_carrito'))
@@ -533,9 +561,12 @@ def checkout():
 
 @app.route('/pago/exitoso')
 def pago_exitoso():
-    orden = session.pop('orden_pendiente', None)
-    session.pop('cart', None)  # vaciamos el carrito
-    session.modified = True
+    orden_id = request.args.get('orden', '')
+    orden    = session.pop('orden_pendiente', None)
+    # Vaciamos el carrito solo si la orden coincide
+    if orden and orden.get('orden_id') == orden_id:
+        session.pop('cart', None)
+        session.modified = True
     return render_template('pago_exitoso.html', orden=orden)
 
 
@@ -546,22 +577,41 @@ def pago_cancelado():
 
 @app.route('/pago/webhook', methods=['POST'])
 def pago_webhook():
-    """
-    Payválida llama a esta URL para confirmar el pago.
-    Aquí debes guardar la orden en tu base de datos.
-    """
-    data = request.get_json() or request.form
+    # 1. Verificar que la petición viene de OnvoPay
+    webhook_secret = request.headers.get('X-Webhook-Secret', '')
+    if webhook_secret != ONVO_WEBHOOK_SECRET:
+        return jsonify({'error': 'Unauthorized'}), 401
 
-    orden_id  = data.get('order_id')
-    estado    = data.get('status')
-    monto     = data.get('amount')
+    data  = request.get_json()
+    tipo  = data.get('type')
+    pago  = data.get('data', {})
 
-    if estado == 'approved':
-        # Aquí guardas la orden confirmada en tu DB
-        # db.execute("INSERT INTO ordenes ...")
-        pass
+    if tipo == 'payment-intent.succeeded' or tipo == 'checkout-session.succeeded':
+        orden_id    = pago.get('description', '').replace('Okami Fit: ', '').split(',')[0].strip()
+        referencia  = pago.get('id', '')
+        monto       = pago.get('amount', 0)
 
-    return jsonify({"received": True}), 200
+        # Extraemos el orden_id de la descripción o del metadata si lo agregaste
+        # Aquí usamos una forma más robusta buscando por monto y estado pendiente
+        conn   = get_connection()
+        cursor = conn.cursor()
+        try:
+            cursor.execute("""
+                UPDATE ordenes
+                SET estado = 'aprobado',
+                    referencia_pago = ?,
+                    fecha_pago = GETDATE()
+                WHERE orden_id = ? AND estado = 'pendiente'
+            """, (referencia, orden_id))
+            conn.commit()
+        except Exception as e:
+            conn.rollback()
+            return jsonify({'error': str(e)}), 500
+        finally:
+            cursor.close()
+            conn.close()
+
+    return jsonify({'received': True}), 200
 
 
 
