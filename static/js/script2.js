@@ -689,17 +689,19 @@ async function handleNewProductSubmit(event) {
 
 function initializeApp() {
     checkAuthOnLoad();
-    loadCategories();  
-    loadProducts();  
+    loadCategories();
+    loadProducts();
 
     if (DOM.masterLoginForm) DOM.masterLoginForm.addEventListener('submit', handleLogin);
-    if (DOM.closeLoginFormBtn) DOM.closeLoginFormBtn.addEventListener('click', (e) => { e.preventDefault(); toggleLoginForm(false); });
+    if (DOM.closeLoginFormBtn) DOM.closeLoginFormBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        toggleLoginForm(false);
+    });
 
     if (DOM.editCatalogBtn) DOM.editCatalogBtn.addEventListener('click', () => {
         openAdminModal();
     });
-    if (DOM.logoutBtn) DOM.logoutBtn.addEventListener('click', () => { handleLogout(); });
-
+    if (DOM.logoutBtn) DOM.logoutBtn.addEventListener('click', handleLogout);
     if (DOM.closeAdminBtn) DOM.closeAdminBtn.addEventListener('click', closeAdminModal);
 
     window.addEventListener('click', (event) => {
@@ -711,11 +713,14 @@ function initializeApp() {
 
     if (DOM.closeBtnTop) DOM.closeBtnTop.addEventListener('click', closeProductModal);
     if (DOM.closeBtnBottom) DOM.closeBtnBottom.addEventListener('click', closeProductModal);
-    if (DOM.addToCartBtn) DOM.addToCartBtn.addEventListener('click', redirectToWhatsApp);
+
+    // ✅ addToCart en lugar de redirectToWhatsApp
+    if (DOM.addToCartBtn) DOM.addToCartBtn.addEventListener('click', addToCart);
 
     if (DOM.newProductForm) DOM.newProductForm.addEventListener('submit', handleNewProductSubmit);
     if (DOM.showListBtn) DOM.showListBtn.addEventListener('click', () => showAdminSection('list'));
 
+    // ✅ Botón Administrador abre el login
     const floatingButton = document.querySelector('.floating-actions .action-btn:nth-child(1)');
     if (floatingButton) {
         floatingButton.addEventListener('click', (event) => {
