@@ -22,11 +22,23 @@
 
 <body>
 
-    <header class="main-header">
-        <div class="header-banner">
-            <img src="{{ url_for('static', filename='img/Banner-hd.jpeg') }}">
-        </div>
-    </header>
+<header class="main-header">
+    <div class="header-banner">
+        <img src="{{ url_for('static', filename='img/Banner-hd.jpeg') }}">
+    </div>
+
+    <!-- Botón del carrito -->
+    <div class="cart-header-btn">
+        <a href="{{ url_for('ver_carrito') }}" class="cart-icon-link">
+            🛒
+            {% set cart = session.get('cart', {}) %}
+            {% set total_items = cart.values() | sum(attribute='cantidad') %}
+            {% if total_items > 0 %}
+                <span class="cart-badge">{{ total_items }}</span>
+            {% endif %}
+        </a>
+    </div>
+</header>
 
     <div id="adminModal" class="modal-admin">
         <div class="modal-content-admin">

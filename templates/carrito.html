@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito — Okami Fit</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/carrito.css') }}">
+</head>
+
+<body>
+
+    <header class="cart-header">
+        <a href="/" class="back-link">← Seguir comprando</a>
+
+        <div></div>
+    </header>
+
+    <main class="cart-main">
+
+        <h1 class="cart-title">Tu Carrito</h1>
+
+        {% if productos %}
+
+        <div class="cart-layout">
+
+            <!-- Lista de productos -->
+            <section class="cart-items-section">
+                {% for p in productos %}
+                <div class="cart-card">
+                    <div class="cart-card-img">
+                        {% if p.imagen %}
+                        {% if p.imagen.startswith('uploads/') or '/' not in p.imagen %}
+                        <img src="/uploads/{{ p.imagen.split('/')[-1] }}" alt="{{ p.nombre }}">
+                        {% else %}
+                        <img src="{{ url_for('static', filename=p.imagen) }}" alt="{{ p.nombre }}">
+                        {% endif %}
+                        {% else %}
+                        {% endif %}
+                    </div>
+                    <div class="cart-card-info">
+                        <p class="cart-product-name">{{ p.nombre }}</p>
+                        <p class="cart-unit-price">₡{{ "{:,.0f}".format(p.precio) }} por unidad</p>
+                    </div>
+                    <div class="cart-card-right">
+                        <p class="cart-qty">× {{ p.cantidad }}</p>
+                        <p class="cart-subtotal">₡{{ "{:,.0f}".format(p.subtotal) }}</p>
+                        <a href="{{ url_for('remove_from_cart', product_id=p.id) }}" class="remove-btn" title="Quitar">
+                            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                                <path d="M2 4h12M5 4V2h6v2M6 7v5M10 7v5M3 4l1 9h8l1-9" stroke="currentColor"
+                                    stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <div class="cart-clear-row">
+                    <a href="{{ url_for('clear_cart') }}" class="clear-btn">Vaciar carrito</a>
+                </div>
+            </section>
+
+            <!-- Resumen -->
+            <aside class="cart-summary">
+                <h2 class="summary-title">Resumen del pedido</h2>
+
+                <div class="summary-lines">
+                    {% set total_items = productos | sum(attribute='cantidad') %}
+                    <div class="summary-row">
+                        <span>Productos ({{ total_items }})</span>
+                        <span>₡{{ "{:,.0f}".format(total) }}</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>Envío o recolección</span>
+                        <span class="free-tag">A coordinar</span>
+                    </div>
+                </div>
+
+                <div class="summary-total">
+                    <span>Total</span>
+                    <span class="total-amount">₡{{ "{:,.0f}".format(total) }}</span>
+                </div>
+
+                <!-- Reemplaza el <button class="checkout-btn"> por esto -->
+                <form action="/checkout" method="POST" id="checkout-form">
+                    <input type="email" name="email" placeholder="Tu correo electrónico" required style="
+            width: 100%;
+            padding: 10px 12px;
+            margin-bottom: 12px;
+            background: #252525;
+            border: 1px solid #3a3a3a;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 14px;
+        ">
+                    <button type="submit" class="checkout-btn">
+                        🔒 Finalizar Compra
+                    </button>
+                </form>
+
+                <a href="/" class="continue-link">← Seguir comprando</a>
+            </aside>
+
+        </div>
+
+        {% else %}
+
+        <div class="empty-cart">
+            <div class="empty-icon">🛒</div>
+            <h2>Tu carrito está vacío</h2>
+            <p>Aún no has añadido suplementos.</p>
+            <a href="/" class="go-shop-btn">Ver productos</a>
+        </div>
+
+        {% endif %}
+
+    </main>
+
+    <footer class="cart-footer">
+        <p>© 2025 Okami Fit Costa Rica · somosokamifitness@gmail.com</p>
+    </footer>
+
+</body>
+
+</html>

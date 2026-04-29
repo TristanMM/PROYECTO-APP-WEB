@@ -194,3 +194,42 @@ footer {
         width: calc(50% - 10px);
     }
 }
+
+
+
+
+
+.cart-header-btn {
+    position: absolute;
+    top: 16px;
+    right: 20px;
+}
+
+.cart-icon-link {
+    position: relative;
+    font-size: 28px;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -6px;
+    right: -10px;
+    background: #e63946;
+    color: white;
+    font-size: 11px;
+    font-weight: 700;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+}
+
+/* Para que el header soporte position: absolute del carrito */
+.main-header {
+    position: relative;
+}

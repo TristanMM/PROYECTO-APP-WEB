@@ -50,7 +50,10 @@ const DOM = {
     editProductList: document.getElementById('edit-product-list'),
     newProductStockInputs: document.getElementById('new-product-stock-inputs'),
     newProductImageFile: document.getElementById('new-product-image-file'),
+    
 };
+// Este es el punto 2: Conectamos el botón físico con la función que crearemos
+DOM.addToCartBtn.addEventListener('click', addToCart);
 
 let currentProduct = null;
 let selectedVariant = null;
@@ -330,23 +333,74 @@ function closeProductModal() {
     DOM.modal.style.display = 'none';
 }
 
-function redirectToWhatsApp() {
+//function redirectToWhatsApp() {
 
-    const messageLines = [
-        '¡Hola! Estoy interesado/a en comprar el siguiente suplemento:',
-        '',
-        `Producto: ${currentProduct.name}`,
-        '',
-        `Precio: ${formatPrice(currentProduct.price)}`,
-        '',
-        '¿Me confirmas disponibilidad del producto para hacer el pedido?'
-    ];
+   // const messageLines = [
+       // '¡Hola! Estoy interesado/a en comprar el siguiente suplemento:',
+      //  '',
+      //  `Producto: ${currentProduct.name}`,
+     //   '',
+     //   `Precio: ${formatPrice(currentProduct.price)}`,
+     //   '',
+     //   '¿Me confirmas disponibilidad del producto para hacer el pedido?'
+  //  ];
 
-    const encodedMessage = encodeURIComponent(messageLines.join('\n'));
-    const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
-    window.open(whatsappUrl, '_blank');
+    //const encodedMessage = encodeURIComponent(messageLines.join('\n'));
+    //const whatsappUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMessage}`;
+   // window.open(whatsappUrl, '_blank');
+  //  closeProductModal();
+//}
+
+
+
+async function addToCart() {
+    const data = {
+        idProducto: currentProduct.idProducto,
+        nombre:     currentProduct.name,
+        precio:     currentProduct.price,
+        imagen:     currentProduct.urlImagen
+    };
+
+    try {
+        const response = await fetch('/add_to_cart', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+
+        if (response.ok) {
+    const result = await response.json();
+
+    // Actualiza el badge sin recargar la página
+    const badge = document.querySelector('.cart-badge');
+    if (result.cart_count > 0) {
+        if (badge) {
+            badge.textContent = result.cart_count;
+        } else {
+            // Si no existía el badge, lo creamos
+            const link = document.querySelector('.cart-icon-link');
+            if (link) {
+                const newBadge = document.createElement('span');
+                newBadge.className = 'cart-badge';
+                newBadge.textContent = result.cart_count;
+                link.appendChild(newBadge);
+            }
+        }
+    }
+
+    alert(`¡${currentProduct.name} añadido al carrito!`);
     closeProductModal();
+} else {
+            alert("Hubo un error al añadir al carrito.");
+        }
+    } catch (error) {
+        console.error("Error:", error);
+    }
 }
+
+
+
+
 
 async function handleLogin(event) {
     event.preventDefault();

@@ -1,8 +1,13 @@
-from flask import Flask, render_template, request, session, jsonify, redirect, url_for, send_from_directory
+from flask import Flask, flash, render_template, request, session, jsonify, redirect, url_for, send_from_directory
 import pyodbc
 import uuid
 import os
 from functools import wraps
+from pagos import crear_orden_pago
+import uuid
+
+from dotenv import load_dotenv
+load_dotenv()
 
 drivers = pyodbc.drivers()
 
@@ -24,6 +29,7 @@ app.config["SESSION_COOKIE_SAMESITE"] = "None"
 app.config["SESSION_COOKIE_SECURE"] = True  # En producción cámbialo a True
 app.config["SESSION_COOKIE_HTTPONLY"] = True
 app.config["SESSION_PERMANENT"] = False
+app.config['UPLOAD_FOLDER'] = os.path.join(os.path.dirname(__file__), 'uploads')
 
 # Modifica tu diccionario de configuración
 SQL_SERVER_CONFIG = {
@@ -402,6 +408,168 @@ def upload_image():
 @app.route('/uploads/<path:filename>')
 def serve_uploads(filename):
     return send_from_directory('uploads', filename)
+
+
+
+
+
+
+
+
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+@app.route('/add_to_cart', methods=['POST'])
+def add_to_cart():
+    data = request.get_json()
+    item_id = str(data.get('idProducto'))
+    nombre  = data.get('nombre')
+    precio  = float(data.get('precio'))
+    imagen  = data.get('imagen', '')   # ← agregar esto
+
+    cart = session.setdefault('cart', {})
+
+    if item_id in cart:
+        cart[item_id]['cantidad'] += 1
+    else:
+        cart[item_id] = {
+            'id':       item_id,
+            'nombre':   nombre,
+            'precio':   precio,
+            'imagen':   imagen,           # ← guardarla aquí
+            'cantidad': 1
+        }
+
+    session.modified = True
+    total_items = sum(p['cantidad'] for p in cart.values())
+    return jsonify({"status": "success", "cart_count": total_items}), 200
+
+
+@app.route('/carrito')
+def ver_carrito():
+    cart = session.get('cart', {})          # ahora es dict, no lista
+    productos_carrito = []
+    total = 0
+
+    for item in cart.values():
+        subtotal = item['precio'] * item['cantidad']
+        productos_carrito.append({
+            'id':       item['id'],
+            'nombre':   item['nombre'],
+            'precio':   item['precio'],
+            'cantidad': item['cantidad'],
+            'subtotal': subtotal,
+            'imagen':   item.get('imagen', '')
+        })
+        total += subtotal
+
+    return render_template('carrito.html', productos=productos_carrito, total=total)
+
+
+@app.route('/remove_from_cart/<product_id>')
+def remove_from_cart(product_id):
+    cart = session.get('cart', {})
+    product_id = str(product_id)            # aseguramos que sea string
+
+    if product_id in cart:
+        if cart[product_id]['cantidad'] > 1:
+            cart[product_id]['cantidad'] -= 1   # resta 1 unidad
+        else:
+            cart.pop(product_id)                # elimina el producto
+
+        session['cart'] = cart
+        session.modified = True
+
+    return redirect(url_for('ver_carrito'))
+
+@app.route('/clear_cart')
+def clear_cart():
+    session.pop('cart', None)
+    return redirect(url_for('ver_carrito'))
+
+
+@app.route('/checkout', methods=['POST'])
+def checkout():
+    cart = session.get('cart', {})
+    if not cart:
+        return redirect(url_for('ver_carrito'))
+
+    # Calculamos el total
+    total = sum(item['precio'] * item['cantidad'] for item in cart.values())
+
+    # Generamos un ID único para esta orden
+    orden_id = str(uuid.uuid4())[:12].upper()
+
+    # Descripción del pedido
+    nombres = ', '.join(item['nombre'] for item in cart.values())
+    descripcion = f"Okami Fit: {nombres[:100]}"
+
+    # Email del cliente (lo pediremos en el formulario del carrito)
+    email_cliente = request.form.get('email', 'cliente@correo.com')
+
+    # Guardamos la orden en sesión para recuperarla después
+    session['orden_pendiente'] = {
+        'orden_id':  orden_id,
+        'total':     total,
+        'productos': list(cart.values())
+    }
+    session.modified = True
+
+    # Creamos la orden en Payválida
+    resultado = crear_orden_pago(
+        orden_id=orden_id,
+        monto_colones=int(total),
+        descripcion=descripcion,
+        email_cliente=email_cliente
+    )
+
+    if resultado['ok']:
+        return redirect(resultado['url_pago'])  # redirige a Payválida
+    else:
+        flash(f"Error al procesar el pago: {resultado['error']}", 'error')
+        return redirect(url_for('ver_carrito'))
+
+
+@app.route('/pago/exitoso')
+def pago_exitoso():
+    orden = session.pop('orden_pendiente', None)
+    session.pop('cart', None)  # vaciamos el carrito
+    session.modified = True
+    return render_template('pago_exitoso.html', orden=orden)
+
+
+@app.route('/pago/cancelado')
+def pago_cancelado():
+    return render_template('pago_cancelado.html')
+
+
+@app.route('/pago/webhook', methods=['POST'])
+def pago_webhook():
+    """
+    Payválida llama a esta URL para confirmar el pago.
+    Aquí debes guardar la orden en tu base de datos.
+    """
+    data = request.get_json() or request.form
+
+    orden_id  = data.get('order_id')
+    estado    = data.get('status')
+    monto     = data.get('amount')
+
+    if estado == 'approved':
+        # Aquí guardas la orden confirmada en tu DB
+        # db.execute("INSERT INTO ordenes ...")
+        pass
+
+    return jsonify({"received": True}), 200
+
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
     # Azure requiere que la app escuche en 0.0.0.0
