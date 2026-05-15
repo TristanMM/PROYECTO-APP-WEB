@@ -47,11 +47,13 @@ def get_connection():
     try:
         # Cadena de conexión para Azure (requiere Authentication y Encrypt)
         conn_str = (
-    f"DRIVER={SQL_SERVER_CONFIG['driver']};"
-    "SERVER=localhost\\SQLEXPRESS;"
-    "DATABASE=BD_Okamifit;"
-    "Trusted_Connection=yes;"
-    "TrustServerCertificate=yes;"
+            f"DRIVER={SQL_SERVER_CONFIG['driver']};"
+            f"SERVER={SQL_SERVER_CONFIG['server']};"
+            f"DATABASE={SQL_SERVER_CONFIG['database']};"
+            f"UID={SQL_SERVER_CONFIG['user']};"
+            f"PWD={SQL_SERVER_CONFIG['pass']};"
+            "Encrypt=yes;"
+            "TrustServerCertificate=no;"
 )
         return pyodbc.connect(conn_str)
     except Exception as e:
