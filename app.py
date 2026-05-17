@@ -53,7 +53,7 @@ def get_connection():
             f"UID={SQL_SERVER_CONFIG['user']};"
             f"PWD={SQL_SERVER_CONFIG['pass']};"
             "Encrypt=yes;"
-            "TrustServerCertificate=no;"
+            "TrustServerCertificate=yes;"
 )
         return pyodbc.connect(conn_str)
     except Exception as e:
