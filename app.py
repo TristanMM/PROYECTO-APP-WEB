@@ -503,8 +503,6 @@ def checkout():
     total         = sum(item['precio'] * item['cantidad'] for item in cart.values())
     orden_id      = str(uuid.uuid4())[:12].upper()
     email_cliente = request.form.get('email', '')
-    nombres       = ', '.join(item['nombre'] for item in cart.values())
-    descripcion   = f"Okami Fit: {nombres[:100]}"
 
     # 1. Guardar orden pendiente en BD
     conn   = get_connection()
@@ -529,33 +527,37 @@ def checkout():
                 item['precio'] * item['cantidad']
             ))
         conn.commit()
+
     except Exception as e:
         conn.rollback()
-        flash(f'Error creando la orden: {e}', 'error')
-        return redirect(url_for('ver_carrito'))
-    finally:
         cursor.close()
         conn.close()
+        flash(f'Error creando la orden: {e}', 'error')
+        return redirect(url_for('ver_carrito'))
 
-    # 2. Crear sesión de checkout en OnvoPay
+    # 2. Llamar a OnvoPay con la conexión aún abierta
     BASE_URL  = request.host_url.rstrip('/')
     resultado = crear_checkout_session(
-    items_carrito = list(cart.values()),
-    orden_id      = orden_id,
-    email_cliente = email_cliente,
-    success_url   = f'{BASE_URL}/pago/exitoso?orden={orden_id}',
-    cancel_url    = f'{BASE_URL}/pago/cancelado'
-)
+        items_carrito = list(cart.values()),
+        orden_id      = orden_id,
+        email_cliente = email_cliente,
+        success_url   = f'{BASE_URL}/pago/exitoso?orden={orden_id}',
+        cancel_url    = f'{BASE_URL}/pago/cancelado',
+        conn          = conn    # ← conexión todavía abierta
+    )
+
+    # 3. Cerrar conexión después de OnvoPay
+    cursor.close()
+    conn.close()
 
     if resultado['ok']:
-        # Guardamos el ID de sesión OnvoPay para verificarlo después
         session['orden_pendiente'] = {
             'orden_id':   orden_id,
             'total':      total,
             'session_id': resultado['id']
         }
         session.modified = True
-        return redirect(resultado['url'])  # → página de pago de OnvoPay
+        return redirect(resultado['url'])
     else:
         flash(f"Error al procesar el pago: {resultado['error']}", 'error')
         return redirect(url_for('ver_carrito'))
